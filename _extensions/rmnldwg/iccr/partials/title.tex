@@ -1,0 +1,15 @@
+$if(title)$
+\title{$title$}
+$endif$
+
+$for(by-author)$
+\author[$if(by-author.affiliations)$%
+$for(by-author.affiliations)$$it.id$$sep$,$endfor$%
+$endif$]{$by-author.name.literal$}
+$endfor$
+
+$for(by-affiliation)$
+\affil[$it.id$]{$_affiliations.tex()$}
+$endfor$
+
+\date{$date$}
