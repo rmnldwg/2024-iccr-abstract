@@ -1,0 +1,53 @@
+---
+title: A mixture of hidden Markov models to predict the lymphatic spread on head and neck cancer
+author:
+  - name: Roman Ludwig
+    orcid: 0000-0001-9434-328X
+    email: roman.ludwig@usz.ch
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Julian Brönnimann
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Jan Unkelbach
+    orcid: 0000-0002-4275-990X
+    affiliations:
+      - ref: 1
+      - ref: 2
+affiliation:
+  - id: 1
+    name: University of Zurich
+    departement: Departement of Physics
+    city: Zurich
+    country: Switzerland
+  - id: 2
+    name: University Hospital Zurich
+    departement: Departement of Radiation Oncology
+    city: Zurich
+    country: Switzerland
+bibliography: references.bib
+abstract: |
+  We previously developed a mechanistic hidden Markov model (HMM) to predict the
+  lymphatic tumor progression in oropharyngeal squamous cell carcinomas (OPSCCs). To
+  extend the model to other tumor subsites, defined by ICD-10 codes, in the head and
+  neck, we employ a mixture of these HMMs and learn the cluster assignments and model
+  parameters in an iterative, EM-like algorithm from multi-centric data. The mixture
+  model manages to cluster anatomically close subsites and correctly infers the
+  clusters' parameters. Using this mixture model allows the prediction of individual
+  risks of occult nodal disease, given a diagnosis that includes tumor subsite.
+---
+
+# Introduction
+
+
+
+
+# Materials and Methods
+
+
+# Results
+
+
+# Discussion
