@@ -1,5 +1,5 @@
 ---
-title: A mixture of hidden Markov models to predict the lymphatic spread on head and neck cancer
+title: A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer
 author:
   - name: Roman Ludwig
     orcid: 0000-0001-9434-328X
@@ -16,7 +16,7 @@ author:
     affiliations:
       - ref: 1
       - ref: 2
-affiliation:
+affiliations:
   - id: 1
     name: University of Zurich
     departement: Departement of Physics
@@ -37,17 +37,36 @@ abstract: |
   model manages to cluster anatomically close subsites and correctly infers the
   clusters' parameters. Using this mixture model allows the prediction of individual
   risks of occult nodal disease, given a diagnosis that includes tumor subsite.
+format:
+  iccr-pdf: default
 ---
 
 # Introduction
 
+Current diagnostic imaging modalities are unable to detect microscopic nodal metastases, which requires pathological examination of extracted tissue [@snyder_petct_2021;@strohl_petct_2021]. However, the presence of nodal disease is detrimental to a patient's outcome [@jones_level_1994;@lim_distributions_2006;@takes_staging_2004]. Thus, large volumes in the head and neck region are often irradiated electively to minimize the risk of missing occult disease. However, the decision guidelines [@vorwerk_guidelines_2011;@gregoire_delineation_2018;@biau_selection_2019] which nodal regions -- i.e., anatomically defined lymph node levels (LNLs) -- to irradiate are not based on a patient's individual risk, but only on the overall prevalence of nodal disease as reported in the literature [@woolgar_topography_2007;@candela_patterns_1990;@chao_determination_2002;@shah_patterns_1990].
+
+To personalize this prediction of the risk for occult diease, given a patient's individual diagnosis, we published
+
+1. large, multi-centric data that details per patient which LNLs where clinically and/or pathologically (following neck dissection) involved [@ludwig_dataset_2022;@ludwig_multi-centric_2023].
+
+And, building on this work,
+
+2. an interpretable hidden Markov model (HMM), trained with this data, to predict the risk for occult nodal disease [@ludwig_hidden_2021;@ludwig_modelling_2023].
+
+Such a personalized risk prediction may allow clinitians to safely reduce the elective clinical target volume (CTV-N) and thus reduce side-effects that degrade the patient's quality of life [@batth_practical_2014].
+
+HNSCC patients with primary tumors at different subsites, e.g. in the oral cavity and in the oropharynx, also show different patterns of lymphatic spread. To capture this in a risk prediction using our previously developed model, one would need to train entirely separate models for each subsite, based on separated datasets. We consider this a limitation for two reasons:
+
+1. While the spread from the tumor to the LNLs may differ for different primary tumor subsites, we would assume the spread from involved LNLs further down the lymphatic network to still be similar. Thus, a dataset of oral cavity patients may contain information that is relevant to the oropharynx model and vice versa.
+2. A tumor may lie anatomically between two subsites. Then, it makes sense to assume that this tumor spreads in a way that can be described as a combination of the typical spread patterns of these two subsites, given they are close enough to each other. This presents an opportunity to reduce the model's complexity: If a subsite's lymphatic spread can be described as a mixture of two others' spread patterns, we only require two distinct HMMs to describe three tumor subsites.
+
+In the work presented here, we implement a mixture of HMMs that aims to address these limitations. In @sec-materials-and-methods we first introduce the basic concept of the HMM, followed by a general description of mixture models and how we implemented them in our particular case.
 
 
+# Materials and Methods {#sec-materials-and-methods}
 
-# Materials and Methods
 
-
-# Results
+# Results {#sec-results}
 
 
 # Discussion
