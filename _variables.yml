@@ -1,0 +1,5 @@
+time-prior:
+  early:
+    p: "0.3"
+
+t_max: 11
