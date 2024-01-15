@@ -1,0 +1,197 @@
+---
+title: A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer
+author:
+  - name: Roman Ludwig
+    orcid: 0000-0001-9434-328X
+    email: roman.ludwig@usz.ch
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Julian Brönnimann
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Jan Unkelbach
+    orcid: 0000-0002-4275-990X
+    affiliations:
+      - ref: 1
+      - ref: 2
+affiliations:
+  - id: 1
+    name: University of Zurich
+    departement: Departement of Physics
+    city: Zurich
+    country: Switzerland
+  - id: 2
+    name: University Hospital Zurich
+    departement: Departement of Radiation Oncology
+    city: Zurich
+    country: Switzerland
+bibliography: ../references.bib
+abstract: |
+  We previously developed a mechanistic hidden Markov model (HMM) to predict the
+  lymphatic tumor progression in oropharyngeal squamous cell carcinomas (OPSCCs). To
+  extend the model to other tumor subsites, defined by ICD-10 codes, in the head and
+  neck, we employ a mixture of these HMMs and learn the cluster assignments and model
+  parameters in an iterative, EM-like algorithm from multi-centric data. The mixture
+  model manages to cluster anatomically close subsites and correctly infers the
+  clusters' parameters. Using this mixture model allows the prediction of individual
+  risks of occult nodal disease, given a diagnosis that includes tumor subsite.
+format:
+  iccr-pdf:
+    keep-tex: true
+    include-in-header:
+      text: "\\usepackage{newtxtext,newtxmath}"
+crossref:
+  fig-prefix: "figure"
+  tbl-prefix: "table"
+  eq-prefix: "equation"
+  sec-prefix: "section"
+---
+
+# Introduction
+
+Head and neck squamous cell carcinomas (HNSCC) frequently spread through the lymphatic system [@lindberg_distribution_1972;@candela_patterns_1990;@woolgar_histological_1999]. Current diagnostic imaging modalities are unable to detect microscopic nodal metastases, which requires pathological examination of extracted tissue [@snyder_petct_2021;@strohl_petct_2021]. Since the recurrence of nodal disease is detrimental to a patient's outcome [@ho_decision_2014], large volumes in the head and neck region are often irradiated electively to minimize the risk of missing occult disease. Decision guidelines about which nodal regions -- i.e., anatomically defined lymph node levels (LNLs) -- to irradiate [@vorwerk_guidelines_2011;@gregoire_delineation_2018;@biau_selection_2019] are currently not based on a patient's individual risk, but only on the overall prevalence of nodal disease as reported in the literature [@lindberg_distribution_1972;@candela_patterns_1990;@woolgar_histological_1999;@chao_determination_2002].
+
+To personalize this prediction of the risk for occult diease, given a patient's individual diagnosis, we published
+
+1. large, multi-centric data that reports per patient which LNLs where clinically and/or pathologically involved [@ludwig_dataset_2022;@ludwig_multi-centric_2023].
+
+And, building on this work,
+
+2. an interpretable hidden Markov model (HMM), trained with this data, to predict the risk for occult nodal disease [@ludwig_hidden_2021;@ludwig_modelling_2023], given an individual patient's diagnosis.
+
+Such a personalized risk prediction may allow clinitians to safely reduce the elective clinical target volume (CTV-N) and thus reduce side-effects that degrade the patient's quality of life [@batth_practical_2014].
+
+HNSCC patients with primary tumors at different subsites, e.g. in the oral cavity and in the oropharynx, also show different patterns of lymphatic spread [@lindberg_distribution_1972;@candela_patterns_1990;@woolgar_histological_1999]. To naively capture this in a risk prediction using our previously developed model, one would need to train entirely separate models for each subsite, based on separated datasets. We consider this a limitation for two reasons:
+
+1. While the spread from the tumor to the LNLs may differ for different primary tumor subsites, we would assume the spread from involved LNLs further down the lymphatic network to still be similar. Thus, a dataset of oral cavity patients may contain information that is relevant to the oropharynx model and vice versa.
+2. A tumor may lie anatomically between two subsites. Then, it makes sense to assume that this tumor spreads in a way that can be described as a combination of the typical spread patterns of these two subsites, given they are close enough to each other. This presents an opportunity to reduce the model's complexity: If a subsite's lymphatic spread can be described as a mixture of two others' spread patterns, we only require two distinct HMMs to describe three tumor subsites.
+
+In the work presented here, we implement a mixture of HMMs that aims to address these limitations. In @sec-materials-and-methods we first introduce the basic concept of the HMM (@sec-hmm), followed by a general description of mixture models (@sec-mixture-of-hmms) and how we implemented them in our particular case.
+
+
+# Materials and Methods {#sec-materials-and-methods}
+
+To compute the personalized risk of occult disease $\mathbf{X}$, given a diagnosis $\mathbf{Y}$, we can begin by stating Bayes' law:
+
+$$
+P \left( \mathbf{X} \mid \mathbf{Y} \right) = \frac{P \left( \mathbf{Y} \mid \mathbf{X} \right) P \left( \mathbf{X} \right)}{\sum_{\mathbf{X}^\star} P \left( \mathbf{Y} \mid \mathbf{X}^\star \right) P \left( \mathbf{X}^\star \right)}
+$$ {#eq-bayes-law}
+
+In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is given by the sensitivity and specificity of the diagnosis. The crucial term that our model attempts to compute, is the prior probability of involvement $P \left( \mathbf{X} \right)$ (or rather of the hidden state of involvement, see the [next section](#sec-hmm)).
+
+
+## Hidden Markov Model for Lymphatic Progression {#sec-hmm}
+
+Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a hidden binary random variable (RV) $X_v[t]$ representing the true -- but not directly observable -- state of that level at the abstract time-step $t$. It may take on the values "healthy" (0) or "involved" (1). Collected in a random vector $\mathbf{X}[t] = \left( X_1[t], X_2[t], \ldots, X_V[t] \right)$ they form the patient's hidden state w.r.t. their lymphatic involvement at time $t$.
+
+When a patient gets diagnosed, their LNLs' involvement status is assessed using a clinical modality $\mathcal{O}$ with its repsective sensitivity $s_N^\mathcal{O}$ and specificity $s_P^\mathcal{O}$. This involvement status, too, is modelled as an RV $Y_v^\mathcal{O}$. Hence, a diagnosis obtained with diagnostic modality $\mathcal{O}$ can be collected in the random vector $\mathbf{Y}^\mathcal{O}$.
+
+
+![Example of a parametrized graph representation of a small lymphatic network consisting of only three LNLs. Blue, round nodes represent the hidden RVs, while the orange square nodes show the observed RVs. Every arc represents a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.png){#fig-graph-with-obs width="25%"}
+
+
+We model the process of tumor progression via lymphatic drainage by connecting the hidden RVs in a graph, as shown in @fig-graph-with-obs. The arcs in [this graph](#fig-graph-with-obs) represent conditional probabilities. The orange arcs, as mentioned, correspond to observing a diagnosis $Z_v^\mathcal{O}$, given a hidden state $X_v$. The values this conditional probability $P(Y_v \mid X_v)$ can take on are tabulated in @tbl-sens-spec.
+
+
++---------+---------+---------+
+|         | $X_v=0$ | $X_v=1$ |
++=========+:=======:+:=======:+
+| $Y_v=0$ | $s_P$   | $1-s_N$ |
++---------+---------+---------+
+| $Y_v=1$ | $1-s_P$ | $s_N$   |
++---------+---------+---------+
+
+: Table encoding the conditional probability $P(Y_v \mid X_v)$ to correctly (or wrongly) diagnose an LNL's true hidden state. This table is associated with the orange arcs in @fig-graph-with-obs. {#tbl-sens-spec}
+
+
+Similarily, the red arcs in @fig-graph-with-obs depict the probability that the primary tumor spreads within one abstract time-step. Lastly, the blue arcs symbolize the spread from an upstream LNL -- given it is already metastatic -- to a downstream level. For example, the edge from $X_2$ to $X_3$ encodes the probability $P\left( X_3[t+1] \mid X_2[t] \right)$, which is parametrized with $b_3$, and $t_{2 \rightarrow 3}$ and tabulated in @tbl-spread-2-to-3. There is an additional restriction on any LNL's state $X_v[t+1]=0$ to be healthy: It requires that the level was also healthy in the time-step before, meaning $X_v[t]=0$. This is because we assume no spontaneous self-healing of metastatic levels.
+
+
++--------------+------------+-----------------------------------------------------+
+|              | $X_2[t]=0$ | $X_2[t]=1$                                          |
++==============+:==========:+:===================================================:+
+| $X_3[t+1]=0$ | $1-b_3$    | $(1-b_3)(1-t_{2 \rightarrow 3})$                    |
++--------------+------------+-----------------------------------------------------+
+| $X_3[t+1]=1$ | $b_3$      | $1-b_3-t_{2 \rightarrow 3}+b_3 t_{2 \rightarrow 3}$ |
++--------------+------------+-----------------------------------------------------+
+
+: Conditional probability $P\left( X_3[t+1] \mid X_2[t] \right)$ for a spread from LNL II to III during the transition from $t$ to $t+1$. This corresponds to one of the blue arcs in @fig-graph-with-obs. {#tbl-spread-2-to-3 tbl-colwidths="[25,18,40]"}
+
+
+With the introduced conditional probabilities, we can now compute the joint probability of any complete hidden state $\mathbf{X}[t]=\boldsymbol{\xi}_i$ transitioning to any other possible state $\mathbf{X}[t+1]=\boldsymbol{\xi}_j$. Here, the $i$ and $j$ enumerate all $2^V$ combinations of the $V$ binary RVs. In the graph shown in @fig-graph-with-obs, this amounts to $2^V=8$ distinct $\boldsymbol{\xi}_i$. Because these terms are essentially products of terms like those in @tbl-spread-2-to-3. We can then collect these terms in a _transition matrix_ $\mathbf{A}$:
+
+$$
+\mathbf{A} = \begin{pmatrix} A_{ij} \end{pmatrix} = P \left( \mathbf{X}[t+1] = \boldsymbol{\xi}_j \mid \mathbf{X}[t] = \boldsymbol{\xi}_i \right)
+$$ {#eq-transition-matrix}
+
+Note that this matrix still depends on the $b_v$ and $t_{r \rightarrow v}$ parameters, although we have dropped the explicit dependcy to keep the equations brief. Now, assuming that every patient started their disease with all LNLs being healthy, we can define the _starting distribution_ $\boldsymbol{\pi}$:
+
+$$
+\boldsymbol{\pi} = \begin{pmatrix} \pi_i \end{pmatrix} = P \left( \mathbf{X}[0] = \boldsymbol{\xi}_i \right)
+$$ {#eq-starting-distribution}
+
+And set every entry of this starting distribution to zero, except the first entry, which we set to one. This means at $t=0$ there is a probability of one to be in the completly healthy state $\boldsymbol{\xi}_0 = \begin{pmatrix} 0, 0, \ldots, 0 \end{pmatrix}$.
+
+Using the quantities introduced so far, the probability distribution vector with elements $P \left( \mathbf{X}[t]=\boldsymbol{\xi}_i \right)$ after $t$ time-steps can now be conveniently expressed as a matrix product:
+
+$$
+P \left( \mathbf{X}[t]=\boldsymbol{\xi}_i \right) = \left( \boldsymbol{\pi} \cdot \mathbf{A}^t \right)_i
+$$ {#eq-evolution}
+
+This evolution implicitly marginalizes over all possible paths to arrive at state $\boldsymbol{\xi}_i$ after $t$ time-steps. Additionally, we also need to marginalize over the time of diagnosis -- which is unknown -- using a time-prior $P_T(t)$. Fortunately, the exact length and shape of this distribution on its own has little impact. But because we assume that early and advanced T-category patients are fundamentally the same, just on average diagnosed at different times $t$, we use the time-prior only to separate the respective patient's evolutions:
+
+$$
+P \left( \mathbf{X}=\boldsymbol{\xi}_i \mid T \right) = \sum_{t=0}^{t_\text{max}} P_T(t) \left( \boldsymbol{\pi} \cdot \mathbf{A}^t \right)_i
+$$ {#eq-marginalized-evolution}
+
+where $T \in \{ \text{early}, \text{advanced} \}$ denotes the T-category. We fix $P_\text{early}(t)$ to a binomial distribution with parameters $n=t_\text{max}=$ {{< var t_max >}} and $p_\text{early}=$ {{< var time-prior.early.p >}}, while the advanced T-category's time-prior is also a binomial distribution where the $p_\text{advanced}$ parameter is learned.
+
+Note that [the above equation](#eq-marginalized-evolution) still depends on the parametrization of the transition matrix. We collect these parameters in a vector $\boldsymbol{\theta}=\{ b_v, t_{r \rightarrow v}, p_\text{advanced} \}$.
+
+To train our model, we need to compute the likelihood of a dataset $\mathcal{D}=\left( \mathbf{Y}_1, \mathbf{Y}_2, \ldots, \mathbf{Y}_N \right)$ of $N$ previously observed patient diagnoses, given the model's parameters $\boldsymbol{\theta}$. This is given by a product of the sums in the denominator of @eq-bayes-law:
+
+$$
+\mathcal{L}(\mathcal{D} \mid \boldsymbol{\theta}) = \prod_{i=1}^N \sum_{j=1}^{2^V} P \left( \mathbf{Y}_i \mid \mathbf{X} = \boldsymbol{\xi}_j \right) P \left( \mathbf{X} = \boldsymbol{\xi}_j \mid T_i \right)
+$$
+
+Typically, one would compute the logarithm of this quantity for computational reasons. There is a wide array of available methods to obtain maximum likelihood estimates from this function or sample from the posterior over $\boldsymbol{\theta}$. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the `emcee` Python package [@foreman-mackey_emcee_2013].
+
+
+## Mixture of HMMs {#sec-mixture-of-hmms}
+
+The just introduced model is capable of learning one set of or distribution over parameters $\boldsymbol{\theta}_s$ from a cohort of patients with a primary tumor in a given subsite $s$. If we tried to train it with a cohort consisting of patients with tumors in two very different subsites, the model would likely learn parameters that represent a compromise between the two subcohort's true parameters. This compromise might describe neither of the subcohorts' lymphatic spread patterns sufficiently well.
+
+In such cases, mixture models are often considered. They assume the data to come from a finite mixture distribution, which -- in our particular case -- can be written following @mclachlan_finite_2019:
+
+$$
+P \left( \mathbf{X} \mid \boldsymbol{\Psi} \right) = \sum_{i=0}^g \pi_i \cdot P \left( \mathbf{X} \mid \boldsymbol{\theta}_i \right)
+$$ {#eq-mixture-distribution}
+
+Here, the $\pi_i \in [0,1]$ are the mixing proportions with $\sum_{i=0}^g \pi_i = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g, \pi_1, \ldots, \pi_g \right)$ is the entire vector of unknown parameters in this mixture of $g$ components. Note that we will implement our model such that some of the parameters in each $\boldsymbol{\theta}_i$ are shared across the $g$ components -- namely the $t_{r \rightarrow v}$ corresponding to the blue arcs in @fig-graph-with-obs.
+
+Let now $\mathcal{D} = \left( \mathcal{D}_1, \ldots, \mathcal{D}_s \right)$ be a dataset consisting of $s$ subcohorts each corresponding to patients with tumor in the same subsite. Also, let subcohort $i$ have $N_i$ patients in it.
+
+We can now think of a way of generating this dataset $\mathcal{D}$ under this mixture model:
+
+1. We draw a categorical RV $C_j$ that may take on the values $1, \ldots, g$ with corresponding probabilities $\pi_1, \ldots, \pi_g$:
+  $$
+  P(C_j=c_j) = \pi_{c_j}
+  $$
+  For convenience, we also transform this into a one-hot encoding $\mathbf{z}_j$ that is zero everywhere, except $z_{ij}=1$ when $C_j=i$:
+  $$
+  P \left( \mathbf{Z}_j=\mathbf{z}_j \right) = \prod_{i=0}^g \pi_i^{z_{ij}}
+  $$
+
+2. Then, we draw $\mathbf{y}_j$ from the conditional probability of $P \left( \mathbf{Y}_j \mid \mathbf{Z}_j, \boldsymbol{\Psi} \right)$, which is now given by a slightly modified version of @eq-mixture-distribution:
+  $$
+  P \left( \mathbf{Y}_j \mid \mathbf{Z}_j, \boldsymbol{\Psi} \right) = \frac{\sum_{i=0}^g z_{ij} \cdot \pi_i \cdot P \left( \mathbf{Y}_j \mid \boldsymbol{\theta}_i \right)}{\sum_{i=0}^g z_{ij} \cdot \pi_i} = P \left( \mathbf{Y}_j \mid \boldsymbol{\theta}_\ell \right)
+  $$
+  where $\ell$ is just so that $z_{\ell j}=1$, and all other entries of $\mathbf{z}_j$ are zero.
+
+
+# Results {#sec-results}
+
+
+# Discussion
