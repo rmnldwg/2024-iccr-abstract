@@ -54,7 +54,7 @@ crossref:
 
 # Introduction
 
-Head and neck squamous cell carcinomas (HNSCC) frequently spread through the lymphatic system [@lindberg_distribution_1972;@woolgar_histological_1999]. Current diagnostic imaging modalities are unable to detect microscopic nodal metastases, which requires pathological examination of extracted tissue [@snyder_petct_2021;@strohl_petct_2021]. Since the recurrence of nodal disease is detrimental to a patient's outcome [@ho_decision_2014], large volumes in the head and neck region are often irradiated electively to minimize the risk of missing occult disease. Decision guidelines about which nodal regions -- i.e., anatomically defined lymph node levels (LNLs) -- to irradiate [@vorwerk_guidelines_2011;@biau_selection_2019] are currently not based on a patient's individual risk, but only on the overall prevalence of nodal disease as reported in the literature [@lindberg_distribution_1972;@woolgar_histological_1999].
+Head and neck squamous cell carcinomas (HNSCC) frequently spread through the lymphatic system [@lindberg_distribution_1972;@woolgar_histological_1999]. Current diagnostic imaging modalities are unable to detect microscopic nodal metastases, which requires pathological examination of extracted tissue [@snyder_petct_2021;@strohl_petct_2021]. Since the recurrence of nodal disease is detrimental to a patient's outcome [@ho_decision_2014], large volumes in the head and neck region are often irradiated electively to minimize the risk of missing occult disease. Decision guidelines about which nodal regions -- i.e., anatomically defined lymph node levels (LNLs) -- to irradiate [@biau_selection_2019] are currently not based on a patient's individual risk, but only on the overall prevalence of nodal disease as reported in the literature [@lindberg_distribution_1972;@woolgar_histological_1999].
 
 To personalize this prediction of the risk for occult diease, given a patient's individual diagnosis, we published
 
@@ -76,6 +76,8 @@ In the work presented here, we implement a mixture of HMMs that aims to address 
 
 # Materials and Methods {#sec-materials-and-methods}
 
+![Parametrized graph representation of the lymphatic network considering four LNLs. Blue, round nodes represent the hidden RVs, while orange square nodes show the observed RVs. Arcs represent a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.svg){#fig-graph-with-obs width="22%"}
+
 To compute the personalized risk of occult disease $\mathbf{X}$, given a diagnosis $\mathbf{Y}$, we can begin by stating Bayes' law:
 
 $$
@@ -90,10 +92,6 @@ In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is
 Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a hidden binary random variable (RV) $X_v[t]$ taking on the true -- but not directly observable -- state of that level at the abstract time-step $t$ (0 for "healthy" and 1 for "involved"). Collected in a random vector $\mathbf{X}[t] = \left( X_1[t], X_2[t], \ldots, X_V[t] \right)$ they form the patient's hidden state w.r.t. their lymphatic involvement at time $t$.
 
 When a patient gets diagnosed, their LNLs' involvement status is assessed using a clinical modality $\mathcal{O}$ with its repsective sensitivity $s_N^\mathcal{O}$ and specificity $s_P^\mathcal{O}$. This involvement status, too, is modelled as an RV $Y_v^\mathcal{O}$. Hence, a diagnosis obtained with diagnostic modality $\mathcal{O}$ can be collected in the random vector $\mathbf{Y}^\mathcal{O}$.
-
-
-![Parametrized graph representation of the lymphatic network considering four LNLs. Blue, round nodes represent the hidden RVs, while orange square nodes show the observed RVs. Arcs represent a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.svg){#fig-graph-with-obs width="25%"}
-
 
 We model the process of tumor progression via lymphatic drainage by connecting the hidden RVs in a graph, as shown in @fig-graph-with-obs. The arcs in [this graph](#fig-graph-with-obs) represent conditional probabilities. The orange arcs, as mentioned, correspond to observing a diagnosis $Z_v^\mathcal{O}$, given a hidden state $X_v$. The values this conditional probability $P(Y_v \mid X_v)$ can take on are tabulated in @tbl-sens-spec.
 
@@ -153,11 +151,11 @@ where $T \in \{ \text{early}, \text{advanced} \}$ denotes the T-category. We fix
 
 Note that @eq-marginalized-evolution still depends on the parametrization of the transition matrix. We collect these parameters in a vector $\boldsymbol{\theta}=\{ b_v, t_{r \rightarrow v}, p_\text{advanced} \}$.
 
-To train our model, we need to compute the likelihood of a dataset $\mathcal{D}=\left( \mathbf{y}_1, \mathbf{y}_2, \ldots, \mathbf{y}_N \right)$ of $N$ previously observed patient diagnoses, given the model's parameters $\boldsymbol{\theta}$. This is given by a product of the sums in the denominator of @eq-bayes-law:
+To train our model, we need to compute the likelihood of a dataset $\mathbf{D}=\left( \mathbf{y}_1, \mathbf{y}_2, \ldots, \mathbf{y}_N \right)$ of $N$ patients, given the model's parameters $\boldsymbol{\theta}$. This is given by a product of the sums in the denominator of @eq-bayes-law:
 
 $$
-\mathcal{L}(\mathcal{D} \mid \boldsymbol{\theta}) = \prod_{i=1}^N \underbrace{\sum_{j=1}^{2^V} P \left( \mathbf{Y} = \mathbf{y}_i \mid \mathbf{X} = \boldsymbol{\xi}_j \right) P \left( \mathbf{X} = \boldsymbol{\xi}_j \mid T_i, \boldsymbol{\theta} \right)}_{P \left( \mathbf{Y} = \mathbf{y}_i \mid T_i, \boldsymbol{\theta} \right)}
-$$
+P \left(\mathbf{D} \mid \boldsymbol{\theta} \right) = \prod_{i=1}^N \underbrace{\sum_{j=1}^{2^V} P \left( \mathbf{Y} = \mathbf{y}_i \mid \mathbf{X} = \boldsymbol{\xi}_j \right) P \left( \mathbf{X} = \boldsymbol{\xi}_j \mid T_i, \boldsymbol{\theta} \right)}_{P \left( \mathbf{Y} = \mathbf{y}_i \mid T_i, \boldsymbol{\theta} \right)}
+$$ {#eq-likelihood}
 
 Typically, one would compute the logarithm of this quantity for computational reasons. There is a wide array of available methods to obtain maximum likelihood estimates from this function or sample from the posterior over $\boldsymbol{\theta}$. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the `emcee` Python package [@foreman-mackey_emcee_2013].
 
@@ -166,34 +164,40 @@ Typically, one would compute the logarithm of this quantity for computational re
 
 The just introduced model is capable of learning one set of or distribution over parameters $\boldsymbol{\theta}$ from a cohort of patients with a primary tumor in a given subsite. If we tried to train it with a cohort consisting of patients with tumors in two very different subsites, the model would likely learn parameters that represent a compromise between the two subcohort's true parameters. This compromise might describe neither of the subcohorts' lymphatic spread patterns sufficiently well.
 
-In such cases, mixture models are often considered. They assume the data to come from a finite mixture distribution, which -- in our particular case -- can be written following @mclachlan_finite_2019:
+In such cases, mixture models are often considered. They assume the data to come from a finite mixture distribution, which -- in our particular case -- can be written as follows:
 
 $$
-P \left( \mathbf{Y} \mid \boldsymbol{\Psi} \right) = \sum_{i=0}^g \pi_i \cdot P \left( \mathbf{Y} \mid \boldsymbol{\theta}_i \right)
+P \left( \mathbf{D} \mid \boldsymbol{\Psi} \right) = \sum_{j=0}^g c_j P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)
 $$ {#eq-mixture-distribution}
 
-Here, the $\pi_i \in [0,1]$ are the mixing proportions with $\sum_{i=0}^g \pi_i = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g, \pi_1, \ldots, \pi_g \right)$ is the entire vector of unknown parameters in this mixture of $g$ components. Note that we will implement our model such that some of the parameters in each $\boldsymbol{\theta}_i$ are shared across the $g$ components -- namely the $t_{r \rightarrow v}$ corresponding to the blue arcs in @fig-graph-with-obs.
+Here, the $\mathbf{c} \in [0,1]^g$ is the vector of mixing proportions with $\sum_{j=0}^g c_j = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g\right)$ is the vector of all $g$ models' parameters. Note that we will implement our model such that some of the parameters in each $\boldsymbol{\theta}_j$ are shared across the $g$ components -- namely the $t_{r \rightarrow v}$ corresponding to the blue arcs in @fig-graph-with-obs.
 
-Let now $\mathcal{D} = \left( \mathcal{D}_1, \ldots, \mathcal{D}_s \right)$ be a dataset consisting of $s$ subcohorts each corresponding to patients with tumor in the same subsite. Also, let subcohort $i$ have $N_i$ patients in it.
+Let now $\mathfrak{D} = \left( \mathbf{D}_1, \ldots, \mathbf{D}_s \right)$ be a dataset consisting of $s$ subcohorts of patients. Within a subcohort $i$ we find $N_i$ patients with tumors in the same subsite. We can then introduce a _latent variable_ $\mathbf{Z}$ with a one-hot-encoding: Basically, it can take on values $\mathbf{z}_i \in \{ 0,1 \}^g$ with $z_{ij}=1$ if subcohort $i$ belongs to component $j$ and $z_{ij}=0$ else.
 
-We can now think of a way of generating this dataset $\mathcal{D}$ under this mixture model:
+Introducing this latent variable is helpful, because the mixture model likelihood is invariant w.r.t. permutations of the component labels. This introduces a number of problems, e.g. for common MCMC sampling methods. The latent variable $\mathbf{Z}$ allows us to derive two sets of interdependent equations that we may solve in an iterative fashion (see e.g. @bishop_pattern_2006 for a detailed derivation) that is commonly referred to as _expectation-maximization (EM)_ algorithm:
 
-1. We draw a categorical RV $C_j$ that may take on the values $1, \ldots, g$ with corresponding probabilities $\pi_1, \ldots, \pi_g$. Hence, we have $P(C_j=c_j) = \pi_{c_j}$. For convenience, we also transform this into a one-hot encoding $\mathbf{z}_j$ that is zero everywhere, except $z_{\ell j}=1$ when $C_j=\ell$:
-  $$
-  P \left( \mathbf{Z}_j=\mathbf{z}_j \right) = \prod_{i=0}^g \pi_i^{z_{ij}}
-  $$
+The first are the probabilities of subcohort $i$ to belong to component $j$, given a set of parameters $\boldsymbol{\Psi}^\star$. These are often called the _responsibilities_:
+$$
+\gamma (z_{ij}) = P \left( z_{ij}=1 \mid \mathbf{D}_i , \boldsymbol{\Psi}^\star, \mathbf{c} \right) = \frac{ c_j P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_j^\star \right) }{\sum_{k=0}^g c_k P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_k^\star \right)}
+$$
 
-2. Then, we draw $\mathbf{y}_j$ from the conditional probability of $P \left( \mathbf{Y}_j \mid \mathbf{Z}_j, \boldsymbol{\Psi} \right)$, which is now given by a slightly modified version of @eq-mixture-distribution:
-  $$
-  P \left( \mathbf{Y}_j \mid \mathbf{Z}_j, \boldsymbol{\Psi} \right) = \frac{\sum_{i=0}^g z_{ij} \pi_i P \left( \mathbf{Y}_j \mid \boldsymbol{\theta}_i \right)}{\sum_{i=0}^g z_{ij} \pi_i} = P \left( \mathbf{Y}_j \mid \boldsymbol{\theta}_\ell \right)
-  $$
-  where $\ell$ is just so that $z_{\ell j}=1$, and all other entries of $\mathbf{z}_j$ are zero.
+From this, we can compute new mixing proportions $c_j^\star=\sum_{i=1}^s \gamma (z_{ij}) / s$ and then infer new parameters $\boldsymbol{\Psi}^\star$ -- e.g. via MCMC sampling -- from the resulting likelihood:
+
+$$
+P \left( \mathbf{D} \mid \boldsymbol{\Psi}, \mathbf{c}^\star \right) = \sum_{j=0}^g c_j^\star P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)
+$$
 
 
+## Implementation {#sec-implementation}
 
+We did this in this and that fashion...
 
 
 # Results {#sec-results}
 
+Works super well, of course!
 
-# Discussion
+
+# Discussion {#sec-discussion}
+
+All that's left is for other people to bring this into clinical practice.
