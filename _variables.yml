@@ -2,4 +2,4 @@ time-prior:
   early:
     p: "0.3"
 
-t_max: 11
+t_max: 10
