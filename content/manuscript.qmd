@@ -11,6 +11,62 @@ author:
     affiliations:
       - ref: 1
       - ref: 2
+  - name: Yoel Perez Haas
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Esmée Lauren Looman
+    affiliations:
+      - ref: 1
+      - ref: 2
+  - name: Adrian Schubert
+    affiliations:
+      - ref: 3
+      - ref: 4
+      - ref: 7
+  - name: Dorothea Barbatei
+    affiliations:
+      - ref: 8
+  - name: Laurence Bauwens
+    affiliations:
+      - ref: 8
+  - name: Jean-Marc Hoffmann
+    orcid: 0000-0003-1193-0863
+    affiliations:
+      - ref: 2
+  - name: Sandrine Werlen
+    affiliations:
+      - ref: 4
+      - ref: 5
+  - name: Olgun Elicin
+    orcid: 0000-0002-6996-0646
+    affiliations:
+      - ref: 3
+  - name: Matthias Dettmer
+    orcid: 0000-0003-0948-1392
+    affiliations:
+      - ref: 6
+      - ref: 10
+  - name: Philippe Zrounba
+    orcid: 0000-0001-6223-6113
+    affiliations:
+      - ref: 9
+  - name: Bertrand Poumayou
+    orcid: 0000-0002-8060-7827
+    affiliations:
+      - ref: 2
+  - name: Panagiotis Balermpas
+    orcid: 0000-0001-5261-6446
+    affiliations:
+      - ref: 2
+  - name: Vincent Grégoire
+    affiliations:
+      - ref: 8
+  - name: Roland Giger
+    orcid: 0000-0002-5574-3210
+    affiliations:
+      - ref: 4
+      - ref: 5
   - name: Jan Unkelbach
     orcid: 0000-0002-4275-990X
     affiliations:
@@ -19,14 +75,54 @@ author:
 affiliations:
   - id: 1
     name: University of Zurich
-    departement: Departement of Physics
+    department: Department of Physics
     city: Zurich
     country: Switzerland
   - id: 2
     name: University Hospital Zurich
-    departement: Departement of Radiation Oncology
+    department: Department of Radiation Oncology
     city: Zurich
     country: Switzerland
+  - id: 3
+    name: Bern University Hospital
+    department: Department of Radiation Oncology
+    city: Bern
+    country: Switzerland
+  - id: 4
+    name: Bern University Hospital
+    department: Department of ENT, Head & Neck Surgery
+    city: Bern
+    country: Switzerland
+  - id: 5
+    name: Bern University Hospital
+    department: Head and Neck Anticancer Center
+    city: Bern
+    country: Switzerland
+  - id: 6
+    name: Bern University Hospital
+    department: Institute of Tissue Medicine and Pathology
+    city: Bern
+    country: Switzerland
+  - id: 7
+    name: Réseau Hospitalier Neuchâtelois
+    department: Department of ENT, Head & Neck Surgery
+    city: Neuchâtelois
+    country: Switzerland
+  - id: 8
+    name: Centre Léon Bérard
+    department: Department of Radiation Oncology
+    city: Lyon
+    country: France
+  - id: 9
+    name: Centre Léon Bérard
+    department: Department of Head and Neck Surgery
+    city: Lyon
+    country: France
+  - id: 10
+    name: Klinikum Stuttgart
+    department: Institute of Pathology
+    city: Stuttgart
+    country: Germany
 bibliography: ../references.bib
 abstract: |
   We previously developed a mechanistic hidden Markov model (HMM) to predict the
@@ -76,7 +172,7 @@ In the work presented here, we implement a mixture of HMMs that aims to address 
 
 # Materials and Methods {#sec-materials-and-methods}
 
-![Parametrized graph representation of the lymphatic network considering four LNLs. Blue, round nodes represent the hidden RVs, while orange square nodes show the observed RVs. Arcs represent a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.svg){#fig-graph-with-obs width="22%"}
+![Parametrized graph representation of the lymphatic network considering four LNLs. Blue, round nodes represent the hidden RVs, while orange square nodes show the observed RVs. Arcs represent a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.svg){#fig-graph-with-obs width="20%"}
 
 To compute the personalized risk of occult disease $\mathbf{X}$, given a diagnosis $\mathbf{Y}$, we can begin by stating Bayes' law:
 
@@ -91,9 +187,9 @@ In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is
 
 Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a hidden binary random variable (RV) $X_v[t]$ taking on the true -- but not directly observable -- state of that level at the abstract time-step $t$ (0 for "healthy" and 1 for "involved"). Collected in a random vector $\mathbf{X}[t] = \left( X_1[t], X_2[t], \ldots, X_V[t] \right)$ they form the patient's hidden state w.r.t. their lymphatic involvement at time $t$.
 
-When a patient gets diagnosed, their LNLs' involvement status is assessed using a clinical modality $\mathcal{O}$ with its repsective sensitivity $s_N^\mathcal{O}$ and specificity $s_P^\mathcal{O}$. This involvement status, too, is modelled as an RV $Y_v^\mathcal{O}$. Hence, a diagnosis obtained with diagnostic modality $\mathcal{O}$ can be collected in the random vector $\mathbf{Y}^\mathcal{O}$.
+When a patient gets diagnosed, their LNLs' involvement status is assessed using a clinical modality (e.g. computed tomography (CT) or magnetic resonance imaging (MRI)) with its repsective sensitivity $s_N$ and specificity $s_P$. This involvement status, too, is modelled as an RV $Y_v$. Hence, a diagnosis obtained with this diagnostic modality can be collected in the random vector $\mathbf{Y}$.
 
-We model the process of tumor progression via lymphatic drainage by connecting the hidden RVs in a graph, as shown in @fig-graph-with-obs. The arcs in [this graph](#fig-graph-with-obs) represent conditional probabilities. The orange arcs, as mentioned, correspond to observing a diagnosis $Z_v^\mathcal{O}$, given a hidden state $X_v$. The values this conditional probability $P(Y_v \mid X_v)$ can take on are tabulated in @tbl-sens-spec.
+We model the process of tumor progression via lymphatic drainage by connecting the hidden RVs in a graph, as shown in @fig-graph-with-obs. The arcs in [this graph](#fig-graph-with-obs) represent conditional probabilities. The orange arcs, as mentioned, correspond to observing a diagnosis $Y_v$, given a hidden state $X_v$. The values this conditional probability $P(Y_v \mid X_v)$ can take on are tabulated in @tbl-sens-spec.
 
 
 +---------+---------+---------+
