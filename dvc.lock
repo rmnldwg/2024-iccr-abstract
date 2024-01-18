@@ -1,0 +1,84 @@
+schema: '2.0'
+stages:
+  filter:
+    cmd: "lyscripts data filter data/joined.csv data/filtered.csv --include-subsites
+      C01 C02 C03 C04 C05 C06 C09 C10\n"
+    deps:
+    - path: data/joined.csv
+      hash: md5
+      md5: 962c012d504621c2dd870cc09864f10c
+      size: 934599
+    outs:
+    - path: data/filtered.csv
+      hash: md5
+      md5: e42e51fa4060465e7674da28e1a63150
+      size: 823896
+  join:
+    cmd: "lyscripts data join --inputs data/2021-usz-oropharynx.csv data/2021-clb-oropharynx.csv
+      data/2023-clb-multisite.csv data/2023-isb-multisite.csv data/2023-hvh-oropharynx.csv
+      --output data/joined.csv\n"
+    deps:
+    - path: data/2021-clb-oropharynx.csv
+      hash: md5
+      md5: d40c0a1ae967a6983d60a0a809cf3972
+      size: 92742
+    - path: data/2021-usz-oropharynx.csv
+      hash: md5
+      md5: 1b949c74081ac4b6224186ebbb9c90df
+      size: 159482
+    - path: data/2023-clb-multisite.csv
+      hash: md5
+      md5: 9d72ee96af2c51033a2fb0bb8551e318
+      size: 123938
+    - path: data/2023-hvh-oropharynx.csv
+      hash: md5
+      md5: be0fd6f7e8728b12d8b03a5efc36a701
+      size: 82571
+    - path: data/2023-isb-multisite.csv
+      hash: md5
+      md5: 569984943168f3a56d6ca58d0813dee2
+      size: 204323
+    outs:
+    - path: data/joined.csv
+      hash: md5
+      md5: 962c012d504621c2dd870cc09864f10c
+      size: 934599
+  enhance:
+    cmd: "lyscripts data enhance data/filtered.csv data/enhanced.csv\n"
+    deps:
+    - path: data/filtered.csv
+      hash: md5
+      md5: e42e51fa4060465e7674da28e1a63150
+      size: 823896
+    params:
+      params.yaml:
+        modalities:
+          CT:
+          - 0.76
+          - 0.81
+          MRI:
+          - 0.63
+          - 0.81
+          PET:
+          - 0.86
+          - 0.79
+          FNA:
+          - 0.98
+          - 0.8
+          diagnostic_consensus:
+          - 0.86
+          - 0.81
+          pathology:
+          - 1.0
+          - 1.0
+          pCT:
+          - 0.86
+          - 0.81
+          max_llh:
+          - 1.0
+          - 1.0
+    outs:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 23ef0a98dc362efd6f85dfc2d7ef66f7
+      size: 997600
