@@ -6,13 +6,13 @@ stages:
     deps:
     - path: data/joined.csv
       hash: md5
-      md5: 962c012d504621c2dd870cc09864f10c
-      size: 934599
+      md5: 711468c4027e6221a49568d80635e260
+      size: 934594
     outs:
     - path: data/filtered.csv
       hash: md5
-      md5: e42e51fa4060465e7674da28e1a63150
-      size: 823896
+      md5: 611103c49a8a482b7302339fdebf0173
+      size: 823891
   join:
     cmd: "lyscripts data join --inputs data/2021-usz-oropharynx.csv data/2021-clb-oropharynx.csv
       data/2023-clb-multisite.csv data/2023-isb-multisite.csv data/2023-hvh-oropharynx.csv
@@ -32,24 +32,24 @@ stages:
       size: 123938
     - path: data/2023-hvh-oropharynx.csv
       hash: md5
-      md5: be0fd6f7e8728b12d8b03a5efc36a701
-      size: 82571
+      md5: a5be2bcb32619f901c48bd1d8a7bae8d
+      size: 82567
     - path: data/2023-isb-multisite.csv
       hash: md5
-      md5: 569984943168f3a56d6ca58d0813dee2
-      size: 204323
+      md5: 6135ac91c08b7518372488fb2e0f9b69
+      size: 204322
     outs:
     - path: data/joined.csv
       hash: md5
-      md5: 962c012d504621c2dd870cc09864f10c
-      size: 934599
+      md5: 711468c4027e6221a49568d80635e260
+      size: 934594
   enhance:
     cmd: "lyscripts data enhance data/filtered.csv data/enhanced.csv\n"
     deps:
     - path: data/filtered.csv
       hash: md5
-      md5: e42e51fa4060465e7674da28e1a63150
-      size: 823896
+      md5: 611103c49a8a482b7302339fdebf0173
+      size: 823891
     params:
       params.yaml:
         modalities:
@@ -80,5 +80,27 @@ stages:
     outs:
     - path: data/enhanced.csv
       hash: md5
-      md5: 23ef0a98dc362efd6f85dfc2d7ef66f7
-      size: 997600
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+  plot_prevalence_by_subsite:
+    cmd: "python scripts/prevalence_by_subsite.py --input data/enhanced.csv --params
+      params.yaml --output figures/prevalence_by_subsite.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: scripts/prevalence_by_subsite.py
+      hash: md5
+      md5: 752ad8126acd1376b66f1bc55a83125f
+      size: 4005
+    params:
+      params.yaml:
+        barplot_kwargs:
+          width: 0.9
+          zorder: 2
+    outs:
+    - path: figures/prevalence_by_subsite.svg
+      hash: md5
+      md5: c52663856fb1c7f083015b2c3d785196
+      size: 43477

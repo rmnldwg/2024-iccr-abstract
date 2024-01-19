@@ -1,5 +1,3 @@
-# Parameter file for lyscripts commands
-
 # Define sensitivity & specificity for diagnostic modalities. This is necessary for the
 # data enhancement script from `lyscripts`
 modalities:
@@ -11,3 +9,8 @@ modalities:
   pathology: [1.0, 1.0]
   pCT: [0.86, 0.81]
   max_llh: [1.0, 1.0]
+
+# Keyword arguments for the barplot created by `prevalence_by_subsite.py`
+barplot_kwargs:
+  width: 0.9
+  zorder: 2

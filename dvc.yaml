@@ -40,3 +40,17 @@ stages:
       - modalities
     outs:
       - data/enhanced.csv
+
+  plot_prevalence_by_subsite:
+    cmd: >
+      python scripts/prevalence_by_subsite.py
+      --input data/enhanced.csv
+      --params params.yaml
+      --output figures/prevalence_by_subsite.svg
+    deps:
+      - data/enhanced.csv
+      - scripts/prevalence_by_subsite.py
+    params:
+      - barplot_kwargs
+    outs:
+      - figures/prevalence_by_subsite.svg

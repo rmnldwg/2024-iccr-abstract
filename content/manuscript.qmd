@@ -289,6 +289,8 @@ For the analyses in this work, we used five datasets from four different institu
 4. 239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in Fance
 5. 162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain
 
+![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b" width="49%"}
+
 The data comes in the form of CSV tables and are -- except for the last and most recent addition -- publicly available [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.
 
 

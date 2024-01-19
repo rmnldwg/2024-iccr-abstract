@@ -1,2 +1,3 @@
 dvc
 git+https://github.com/rmnldwg/lyscripts@f46da7ba29ca49dffada8815940b98b1297cedcd
+tueplots==0.0.12

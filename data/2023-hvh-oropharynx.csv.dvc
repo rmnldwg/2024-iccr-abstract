@@ -1,13 +1,13 @@
-md5: 19bd59474fbcce9e3494e24afbf9c77d
+md5: d7f1bd3a38fd53ec28979d1f7050b62c
 frozen: true
 deps:
 - path: 2023-hvh-oropharynx/data.csv
   repo:
     url: git@github.com:rmnldwg/lydata.private
     rev: 2023-hvh-oropharynx
-    rev_lock: c47b04f39b418ff7fa2393b35856415868e0d5d1
+    rev_lock: daae0e2136de5c105eb862e5dc6da4b9b7921f1c
 outs:
-- md5: 27b707dd9965b8966b4363e61cee2403
-  size: 82569
+- md5: a5be2bcb32619f901c48bd1d8a7bae8d
+  size: 82567
   hash: md5
   path: 2023-hvh-oropharynx.csv
