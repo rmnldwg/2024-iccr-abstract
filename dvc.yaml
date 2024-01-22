@@ -19,7 +19,7 @@ stages:
     outs:
       - data/joined.csv
 
-  filter:
+  filter_oropharynx_and_oral_cavity:
     cmd: >
       lyscripts data filter
       data/joined.csv
@@ -34,23 +34,100 @@ stages:
   enhance:
     cmd: >
       lyscripts data enhance data/filtered.csv data/enhanced.csv
+      --params _variables.yml
     deps:
       - data/filtered.csv
     params:
-      - modalities
+      - _variables.yml:
+        - modalities
     outs:
       - data/enhanced.csv
+
+  write_num_patients:
+    cmd: >
+      python scripts/write_num_patients.py
+      --input data/enhanced.csv
+      --output _variables.yml
+    deps:
+      - scripts/write_num_patients.py
 
   plot_prevalence_by_subsite:
     cmd: >
       python scripts/prevalence_by_subsite.py
       --input data/enhanced.csv
-      --params params.yaml
+      --params _variables.yml
       --output figures/prevalence_by_subsite.svg
     deps:
       - data/enhanced.csv
       - scripts/prevalence_by_subsite.py
     params:
-      - barplot_kwargs
+      - _variables.yml:
+        - barplot_kwargs
     outs:
       - figures/prevalence_by_subsite.svg
+
+  filter_oropharynx:
+    cmd: >
+      lyscripts data filter
+      data/enhanced.csv
+      data/oropharynx.csv
+      --include-subsites
+      C01 C09 C10
+    deps:
+      - data/enhanced.csv
+    outs:
+      - data/oropharynx.csv
+
+  sample_from_oropharynx:
+    cmd: >
+      lyscripts sample data/oropharynx.csv models/oropharynx.hdf5
+      --params _variables.yml
+      --modalities max_llh
+      --plots figures/sample_from_oropharynx
+      --pools 0
+      --seed 42
+    deps:
+      - data/oropharynx.csv
+    params:
+      - _variables.yml:
+          - graph
+          - model
+          - sampling
+    plots:
+      - figures/sample_from_oropharynx/acor_times.csv
+      - figures/sample_from_oropharynx/accept_rates.csv
+    outs:
+      - models/oropharynx.hdf5
+
+  filter_oral_cavity:
+    cmd: >
+      lyscripts data filter
+      data/enhanced.csv
+      data/oral_cavity.csv
+      --include-subsites
+      C02 C03 C04 C05 C06
+    deps:
+      - data/enhanced.csv
+    outs:
+      - data/oral_cavity.csv
+
+  sample_from_oral_cavity:
+    cmd: >
+      lyscripts sample data/oral_cavity.csv models/oral_cavity.hdf5
+      --params _variables.yml
+      --modalities max_llh
+      --plots figures/sample_from_oral_cavity
+      --pools 0
+      --seed 42
+    deps:
+      - data/oral_cavity.csv
+    params:
+      - _variables.yml:
+          - graph
+          - model
+          - sampling
+    plots:
+      - figures/sample_from_oral_cavity/acor_times.csv
+      - figures/sample_from_oral_cavity/accept_rates.csv
+    outs:
+      - models/oral_cavity.hdf5
