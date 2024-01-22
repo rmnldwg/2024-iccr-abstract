@@ -231,7 +231,7 @@ $$
 P \left( \mathbf{X}=\boldsymbol{\xi}_i \mid T, \boldsymbol{\theta} \right) = \sum_{t=0}^{t_\text{max}} P_T(t) \left( \boldsymbol{\pi} \cdot \mathbf{A}^t \right)_i
 $$ {#eq-marginalized-evolution}
 
-where $T \in \{ \text{early}, \text{advanced} \}$ denotes the T-category. We fix $P_\text{early}(t)$ to a binomial distribution with parameters $n=t_\text{max}=$ {{< var t_max >}} and $p_\text{early}=$ {{< var time-prior.early.p >}}, while the advanced T-category's time-prior is also a binomial distribution where the $p_\text{advanced}$ parameter is learned.
+where $T \in \{ \text{early}, \text{advanced} \}$ denotes the T-category. We fix $P_\text{early}(t)$ to a binomial distribution with parameters $n=t_\text{max}=$ {{< var model.max_t >}} and $p_\text{early}=$ {{< var model.first_binom_prob >}}, while the advanced T-category's time-prior is also a binomial distribution where the $p_\text{advanced}$ parameter is learned.
 
 Note that @eq-marginalized-evolution still depends on the parametrization of the transition matrix. We collect these parameters in a vector $\boldsymbol{\theta}=\{ b_v, t_{r \rightarrow v}, p_\text{advanced} \}$.
 
@@ -292,6 +292,8 @@ For the analyses in this work, we used five datasets from four different institu
 ![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b" width="49%"}
 
 The data comes in the form of CSV tables and are -- except for the last and most recent addition -- publicly available [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.
+
+In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four LNLs I, II, III, and IV stratified by the primary tumor's subsite. We only included patients with tumors in the gum, floor of mouth, other/unspecified parts of the mouth, palate, oropharynx, tosil, base of tongue, and other/unspecified parts of tongue, resulting in {{< var data.num_patients >}} patients.
 
 
 # Results {#sec-results}
