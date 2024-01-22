@@ -50,6 +50,9 @@ stages:
       --output _variables.yml
     deps:
       - scripts/write_num_patients.py
+    params:
+      - _variables.yml:
+          - icd_code_map
 
   plot_prevalence_by_subsite:
     cmd: >
@@ -63,6 +66,7 @@ stages:
     params:
       - _variables.yml:
         - barplot_kwargs
+        - icd_code_map
     outs:
       - figures/prevalence_by_subsite.svg
 

@@ -293,7 +293,7 @@ For the analyses in this work, we used five datasets from four different institu
 
 The data comes in the form of CSV tables and are -- except for the last and most recent addition -- publicly available [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.
 
-In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four LNLs I, II, III, and IV stratified by the primary tumor's subsite. We only included patients with tumors in the gum, floor of mouth, other/unspecified parts of the mouth, palate, oropharynx, tosil, base of tongue, and other/unspecified parts of tongue, resulting in {{< var num_patients >}} patients.
+In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four LNLs I, II, III, and IV stratified by the primary tumor's subsite. We only included patients with tumors in the gum, floor of mouth, other/unspecified parts of the mouth, palate, oropharynx, tosil, base of tongue, and other/unspecified parts of tongue, resulting in {{< var num_patients.total >}} patients.
 
 
 # Results {#sec-results}

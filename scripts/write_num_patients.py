@@ -8,6 +8,9 @@ import yaml
 from lyscripts.utils import load_patient_data
 
 
+SUBSITE = ("tumor", "1", "subsite")
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Assemble the parser for the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -29,7 +32,15 @@ def main():
         variables = yaml.safe_load(file)
 
     patient_data = load_patient_data(args.input)
-    variables["num_patients"] = len(patient_data)
+    icd_code_map = variables.get("icd_code_map", {})
+    patient_info = variables.get("num_patients", {})
+    patient_info["total"] = len(patient_data)
+
+    for icd_code in icd_code_map.keys():
+        num_icd_code = int(patient_data[SUBSITE].str.contains(icd_code).sum())
+        patient_info[icd_code] = num_icd_code
+
+    variables.update({"num_patients": patient_info})
 
     with open(args.output, "w") as file:
         yaml.dump(variables, file)

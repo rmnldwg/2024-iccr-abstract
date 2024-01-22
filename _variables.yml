@@ -16,6 +16,15 @@ graph:
     - II
     - III
     - IV
+icd_code_map:
+  C01: base of tongue
+  C02: other/unspec. pt. of tongue
+  C03: gum
+  C04: floor of mouth
+  C05: palate
+  C06: other/unspec. pt. of mouth
+  C09: tonsil
+  C10: oropharynx
 modalities:
   CT:
   - 0.76
@@ -52,7 +61,16 @@ model:
   t_stages:
   - early
   - late
-num_patients: 1242
+num_patients:
+  C01: 212
+  C02: 158
+  C03: 45
+  C04: 99
+  C05: 61
+  C06: 46
+  C09: 452
+  C10: 169
+  total: 1242
 sampling:
   burnin: 1000
   kwargs:

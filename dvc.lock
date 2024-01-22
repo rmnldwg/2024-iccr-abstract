@@ -92,17 +92,26 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: a026ed2a619abc3472ed5f64ff6a2c59
-      size: 4005
+      md5: 740ab8ef478b82a9d50415ea61b88aa5
+      size: 3674
     params:
       _variables.yml:
         barplot_kwargs:
           width: 0.9
           zorder: 2
+        icd_code_map:
+          C01: base of tongue
+          C02: other/unspec. pt. of tongue
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: other/unspec. pt. of mouth
+          C09: tonsil
+          C10: oropharynx
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 09951f585e46d4626302d31b7b3b951d
+      md5: 2ec0dbf27ba3c1e02a50d92fe3cddedf
       size: 43272
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -110,8 +119,19 @@ stages:
     deps:
     - path: scripts/write_num_patients.py
       hash: md5
-      md5: f1d83d9cd9eee0b28fb0764f5daf569e
-      size: 1061
+      md5: f096621524dd445e6df56ba2d8c3bc19
+      size: 1422
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: other/unspec. pt. of tongue
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: other/unspec. pt. of mouth
+          C09: tonsil
+          C10: oropharynx
   filter_oropharynx_and_oral_cavity:
     cmd: "lyscripts data filter data/joined.csv data/filtered.csv --include-subsites
       C01 C02 C03 C04 C05 C06 C09 C10\n"
@@ -281,11 +301,11 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: a0397d6b8313eef117e659d3703292b6
-      size: 19799
+      md5: 191a41557e811969c90e73e5357a3e04
+      size: 19805
     - path: figures
       hash: md5
-      md5: abedf829ed40e181fa3451397c257494.dir
+      md5: 5dbc28e458a7f2edd7ddd99e2d37ec31.dir
       size: 47876
       nfiles: 8
     - path: static
@@ -297,9 +317,18 @@ stages:
       _variables.yml:
         model.first_binom_prob: 0.3
         model.max_t: 10
-        num_patients: 1242
+        num_patients:
+          C01: 212
+          C02: 158
+          C03: 45
+          C04: 99
+          C05: 61
+          C06: 46
+          C09: 452
+          C10: 169
+          total: 1242
     outs:
     - path: content/manuscript.pdf
       hash: md5
-      md5: 38e6d3316fc5d66beccbf2b7f826d08c
-      size: 149190
+      md5: f109fb2094e4df09c275da89b4b5898c
+      size: 149198

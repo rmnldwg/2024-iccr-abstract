@@ -21,17 +21,6 @@ LNL_I = ("max_llh", "ipsi", "I")
 LNL_II = ("max_llh", "ipsi", "II")
 LNL_III = ("max_llh", "ipsi", "III")
 LNL_IV = ("max_llh", "ipsi", "IV")
-ICD_CODE_MAP = {
-    "C00": "lip",
-    "C01": "base of tongue",
-    "C02": "other/unspec. pt. of tongue",
-    "C03": "gum",
-    "C04": "floor of mouth",
-    "C05": "palate",
-    "C06": "other/unspec. pt. of mouth",
-    "C09": "tonsil",
-    "C10": "oropharynx",
-}
 OROPHARYNX_ICDS = ["C01", "C09", "C10"]
 
 
@@ -56,11 +45,6 @@ def create_parser() -> argparse.ArgumentParser:
 def simplify_subsite(icd_code: str) -> str:
     """Only use the part of the ICD code before the decimal point."""
     return icd_code.split(".")[0]
-
-
-def make_readable(icd_code: str) -> str:
-    """Make the ICD code human-readable."""
-    return ICD_CODE_MAP[icd_code]
 
 
 def generate_location_colors(
@@ -92,6 +76,7 @@ def main():
         with open(args.params) as f:
             params = yaml.safe_load(f)
         barplot_kwargs.update(params.get("barplot_kwargs", {}))
+        icd_code_map = params.get("icd_code_map", {})
 
     patient_data = load_patient_data(args.input)
     patient_data[SUBSITE] = patient_data[SUBSITE].apply(simplify_subsite)
@@ -100,7 +85,7 @@ def main():
         values=[LNL_I, LNL_II, LNL_III, LNL_IV]
     ).sort_values(by=LNL_II)
     colors = list(generate_location_colors(pivot_table.index))
-    pivot_table.index = pivot_table.index.map(make_readable)
+    pivot_table.index = pivot_table.index.map(icd_code_map)
 
     plt.rcParams.update(figsizes.icml2022_half())
     plt.rcParams.update(fontsizes.icml2022())
