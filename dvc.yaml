@@ -131,3 +131,19 @@ stages:
       - figures/sample_from_oral_cavity/accept_rates.csv
     outs:
       - models/oral_cavity.hdf5
+
+  render_pdf:
+    cmd: >
+      quarto render content/manuscript.qmd --to iccr-pdf
+    deps:
+      - content/manuscript.qmd
+      - _extensions
+      - static
+      - figures
+    params:
+      - _variables.yml:
+          - model.first_binom_prob
+          - model.max_t
+          - num_patients
+    outs:
+      - content/manuscript.pdf

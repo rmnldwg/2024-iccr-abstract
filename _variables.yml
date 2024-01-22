@@ -1,49 +1,65 @@
-# This dictionary defines which LNLs are present in the
-# graph and how they are connected.
+barplot_kwargs:
+  width: 0.9
+  zorder: 2
 graph:
-  tumor:
-    primary: [I, II, III, IV]
   lnl:
-    I: [II]
-    II: [III]
-    III: [IV]
+    I:
+    - II
+    II:
+    - III
+    III:
+    - IV
     IV: []
-
+  tumor:
+    primary:
+    - I
+    - II
+    - III
+    - IV
+modalities:
+  CT:
+  - 0.76
+  - 0.81
+  FNA:
+  - 0.98
+  - 0.8
+  MRI:
+  - 0.63
+  - 0.81
+  PET:
+  - 0.86
+  - 0.79
+  diagnostic_consensus:
+  - 0.86
+  - 0.81
+  max_llh:
+  - 1.0
+  - 1.0
+  pCT:
+  - 0.86
+  - 0.81
+  pathology:
+  - 1.0
+  - 1.0
 model:
-  first_binom_prob: 0.3         # defines shape of time prior of first T-stage
-  max_t: 10                     # max number of time steps to evolve system
-  t_stages: [early, late]       # T-stages to consider in the data
-  class: Unilateral             # model class to use (see `lymph-model` docs)
+  class: Unilateral
+  first_binom_prob: 0.3
   kwargs:
     base_symmetric: false
     trans_symmetric: true
     use_mixing: true
-
-# Define sensitivity & specificity for diagnostic modalities. This is necessary for the
-# data enhancement script from `lyscripts`
-modalities:
-  CT: [0.76, 0.81]
-  MRI: [0.63, 0.81]
-  PET: [0.86, 0.79]
-  FNA: [0.98, 0.80]
-  diagnostic_consensus: [0.86, 0.81]
-  pathology: [1.0, 1.0]
-  pCT: [0.86, 0.81]
-  max_llh: [1.0, 1.0]
-
-# Keyword arguments for the barplot created by `prevalence_by_subsite.py`
-barplot_kwargs:
-  width: 0.9
-  zorder: 2
-
-# This defines the sampler settings and the thermodynamic integration path
+  max_t: 10
+  t_stages:
+  - early
+  - late
+num_patients: 1242
 sampling:
-  walkers_per_dim: 20           # num of parallel walkers per parameter space dimension
-  burnin: 1000                  # burn-in steps to discard
-  nsteps: 20                    # do this many serious steps per sampling round
-  thin_by: 10                   # draw this many samples for one step in `nsteps`
+  burnin: 1000
   kwargs:
-    max_steps: 20000
     check_interval: 50
-    trust_threshold: 30.0
+    max_steps: 20000
     rel_acor_threshold: 0.075
+    trust_threshold: 30.0
+  nsteps: 20
+  thin_by: 10
+  walkers_per_dim: 20

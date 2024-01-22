@@ -29,7 +29,7 @@ def main():
         variables = yaml.safe_load(file)
 
     patient_data = load_patient_data(args.input)
-    variables["data"]["num_patients"] = len(patient_data)
+    variables["num_patients"] = len(patient_data)
 
     with open(args.output, "w") as file:
         yaml.dump(variables, file)

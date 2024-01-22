@@ -110,11 +110,8 @@ stages:
     deps:
     - path: scripts/write_num_patients.py
       hash: md5
-      md5: ddb8ec5d8fc0bb719ddee5d0620a3ab8
-      size: 1069
-    params:
-      _variables.yml:
-        data.num_patients: 1242
+      md5: f1d83d9cd9eee0b28fb0764f5daf569e
+      size: 1061
   filter_oropharynx_and_oral_cavity:
     cmd: "lyscripts data filter data/joined.csv data/filtered.csv --include-subsites
       C01 C02 C03 C04 C05 C06 C09 C10\n"
@@ -274,3 +271,35 @@ stages:
       hash: md5
       md5: 0c506ef22449cc318cf102103096936a
       size: 1604832
+  render_pdf:
+    cmd: "quarto render content/manuscript.qmd --to iccr-pdf\n"
+    deps:
+    - path: _extensions
+      hash: md5
+      md5: 2fc478636b20635d27d084b01c3ec092.dir
+      size: 3885
+      nfiles: 9
+    - path: content/manuscript.qmd
+      hash: md5
+      md5: a0397d6b8313eef117e659d3703292b6
+      size: 19799
+    - path: figures
+      hash: md5
+      md5: abedf829ed40e181fa3451397c257494.dir
+      size: 47876
+      nfiles: 8
+    - path: static
+      hash: md5
+      md5: 7f7cf86e0a573f41b69c4becfa4c1e19.dir
+      size: 208359
+      nfiles: 2
+    params:
+      _variables.yml:
+        model.first_binom_prob: 0.3
+        model.max_t: 10
+        num_patients: 1242
+    outs:
+    - path: content/manuscript.pdf
+      hash: md5
+      md5: 38e6d3316fc5d66beccbf2b7f826d08c
+      size: 149190
