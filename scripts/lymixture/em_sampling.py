@@ -190,9 +190,6 @@ class ExpectationMaximization:
             self.current_cluster_parameters, self.current_cluster_assignments
         )
 
-        self.em_dir = lmm.base_dir / "EM"
-        self.em_dir.mkdir(parents=True, exist_ok=True)
-
 
     def mcmc_sampling(self, log_prob_fn, ndim, llh_args=None, initial_guess=None):
         """
@@ -308,9 +305,6 @@ class ExpectationMaximization:
                 self.current_likelihood,
                 self.convergence.current_convergence_values,
             )
-
-            # Store the history object in each round
-            self.history.save(save_dir=self.em_dir)
 
             if converged:
                 logger.info(f"Step {self.current_step} / {self.max_steps}: Converged!")
@@ -562,8 +556,8 @@ class History:
 
         for i, label in enumerate(label_ts):
             ax.plot(
-                x=range(len(self.convergence_value)),
-                y=[v[i] for v in self.convergence_value],
+                range(len(self.convergence_value)),
+                [v[i] for v in self.convergence_value],
                 label=label,
             )
         ax.set_xlabel("Steps")

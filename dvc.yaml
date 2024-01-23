@@ -136,6 +136,23 @@ stages:
     outs:
       - models/oral_cavity.hdf5
 
+  mixture_model_em_sampling:
+    cmd: >
+      python scripts/mixture_model_sampling.py
+      --input data/enhanced.csv
+      --model models/mixture.hdf5
+      --figure figures/mixture_history.png
+      --params _variables.yml
+    deps:
+      - scripts/mixture_model_sampling.py
+      - data/enhanced.csv
+    params:
+      - _variables.yml:
+          - mixture_model
+    outs:
+      - figures/mixture_history.png
+      - models/mixture.hdf5
+
   render_pdf:
     cmd: >
       quarto render content/manuscript.qmd --to iccr-pdf
@@ -144,6 +161,7 @@ stages:
       - _extensions
       - static
       - figures
+      - models
     params:
       - _variables.yml:
           - model.first_binom_prob

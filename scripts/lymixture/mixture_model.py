@@ -90,8 +90,7 @@ class LymphMixtureModel:
         lymph_model: lymph.models.Unilateral,
         n_clusters: int,
         n_subpopulation: int,
-        base_dir: Optional[Path] = None,
-        name: Optional[str] = None,
+        hdf5_output: str | Path | None = None,
         **_kwargs,
     ):
         # Initialize model configurations
@@ -104,32 +103,17 @@ class LymphMixtureModel:
         self.n_clusters = n_clusters
         self.n_subpopulation = n_subpopulation
 
+        if hdf5_output is None:
+            hdf5_output = Path("models/mixture.hdf5")
+        self.hdf5_output = Path(hdf5_output)
+
         # Compute number of parameters expected by the model
         self.compute_expected_n()
 
-        # Set up directories
-        self.name = name if name else "LMM"
-        if base_dir is None:
-            base_dir = Path(os.getcwd())
-        self.base_dir = base_dir.joinpath(self.name)
-        self._create_directories()
-
         logger.info(
             f"Create LymphMixtureModel of type {type(self.lymph_model)} with "
-            f"{self.n_clusters} clusters in {self.base_dir}"
+            f"{self.n_clusters} clusters."
         )
-
-    def _create_directories(self):
-        """
-        Creates necessary directories for saving outputs.
-        """
-        self.samples_dir = self.base_dir.joinpath("samples/")
-        self.figures_dir = self.base_dir.joinpath("figures/")
-        self.predictions_dir = self.base_dir.joinpath("predictions/")
-        self.base_dir.mkdir(parents=True, exist_ok=True)
-        self.samples_dir.mkdir(parents=True, exist_ok=True)
-        self.figures_dir.mkdir(parents=True, exist_ok=True)
-        self.predictions_dir.mkdir(parents=True, exist_ok=True)
 
 
     def delete_cached_property(self, property: str):
@@ -355,72 +339,46 @@ class LymphMixtureModel:
         return estimated_cluster_assignments, em_history
 
 
-    def _mcmc_sampling(
-        self,
-        mcmc_config: dict,
-        save_samples: bool = True,
-        force_resampling: bool = False,
-    ):
+    def _mcmc_sampling(self, mcmc_config: dict):
         """
         Performs MCMC sampling to determine model parameters for the current cluster
         assignments.
         """
         global LMM_GLOBAL
-
         LMM_GLOBAL = self
+
         sampler = mcmc_config.get("sampler", "SIMPLE")
         sampling_params = mcmc_config["sampling_params"]
         log_prob_fn = log_ll_cl_parameters
 
-        sample_file_name = f"mcmc_sampling_chain_{sampling_params['nsteps']}_{sampling_params['nburnin']}"
-        hdf5_backend = emcee.backends.HDFBackend(
-            self.samples_dir / f"{sample_file_name}.hdf5", name="mcmc"
-        )
+        hdf5_backend = emcee.backends.HDFBackend(self.hdf5_output, name="mcmc")
+        logger.debug(f"Prepared sampling backend at {self.hdf5_output}")
 
-        mcmc_chain_dir = self.samples_dir.joinpath(Path(sample_file_name)).with_suffix(
-            ".npy"
-        )
-        if mcmc_chain_dir.exists() and not force_resampling:
-            logger.info(
-                f"MCMC sampling chain found in {mcmc_chain_dir}. Skipping Sampling."
+        if sampler == "SIMPLE":
+            logger.info("Using simple sampler for MCMC")
+            sample_chain, end_point, log_probs = emcee_simple_sampler(
+                log_prob_fn,
+                ndim=self.n_cluster_parameters,
+                sampling_params=sampling_params,
+                starting_point=None,
+                hdf5_backend=hdf5_backend,
             )
-            sample_chain = np.load(mcmc_chain_dir)
-            end_point, log_probs = None, None
         else:
-            logger.info(
-                f"Prepared sampling params & backend at {self.samples_dir}"
+            logger.info("Using lyscript sampler for MCMC")
+            (
+                sample_chain,
+                end_point,
+                log_probs,
+            ) = sample_from_global_model_and_configs(
+                log_prob_fn,
+                ndim=self.n_cluster_parameters,
+                sampling_params=sampling_params,
+                starting_point=None,
+                hdf5_backend=hdf5_backend,
+                save_dir=self.samples_dir,
+                models=self,
+                verbose=True,
             )
-
-            if sampler == "SIMPLE":
-                logger.info("Using simple sampler for MCMC")
-                sample_chain, end_point, log_probs = emcee_simple_sampler(
-                    log_prob_fn,
-                    ndim=self.n_cluster_parameters,
-                    sampling_params=sampling_params,
-                    starting_point=None,
-                )
-            else:
-                logger.info("Using lyscript sampler for MCMC")
-                (
-                    sample_chain,
-                    end_point,
-                    log_probs,
-                ) = sample_from_global_model_and_configs(
-                    log_prob_fn,
-                    ndim=self.n_cluster_parameters,
-                    sampling_params=sampling_params,
-                    starting_point=None,
-                    hdf5_backend=hdf5_backend,
-                    save_dir=self.samples_dir,
-                    models=self,
-                    verbose=True,
-                )
-
-            if save_samples:
-                np.save(
-                    self.samples_dir / f"{sample_file_name}.npy",
-                    sample_chain,
-                )
 
         return sample_chain, end_point, log_probs
 
@@ -429,8 +387,6 @@ class LymphMixtureModel:
         self,
         em_config: Optional[dict] = None,
         mcmc_config: Optional[dict] = None,
-        force_resampling: bool = False,
-        cluster_assignments: np.ndarray = None,
     ):
         """
         Fits the mixture model, i.e. finds the optimal cluster assignments and the
@@ -440,38 +396,19 @@ class LymphMixtureModel:
         global LMM_GLOBAL
         LMM_GLOBAL = self
 
-        # Skip the EM-Algorithm if there is already a cluster asignments (Only for debug)
-        if cluster_assignments is not None:
-            logger.info(
-                "Skipping EM Algortihm, since cluster assignment is already given"
-            )
-            try:
-                history = np.load(self.base_dir / "EM/" / "history.npy")
-            except:
-                history = None
-        else:
-            # Estimate the Cluster Assignments.
-            cluster_assignments, history = self.estimate_cluster_assignments(em_config)
-            np.save(
-                self.samples_dir / "final_cluster_assignments.npy", cluster_assignments
-            )
-
-        self.cluster_assignments = cluster_assignments
+        # Estimate the Cluster Assignments.
+        self.cluster_assignments, history = self.estimate_cluster_assignments(em_config)
 
         # MCMC Sampling
         # Find the cluster parameters using MCMC based on the cluster assignments.
         # Store the final cluster assignments and parameters
-        sample_chain = []
         if mcmc_config is not None:
-            sample_chain, _, _ = self._mcmc_sampling(
-                mcmc_config, force_resampling=force_resampling
-            )
+            sample_chain, _, _ = self._mcmc_sampling(mcmc_config)
 
-        self.cluster_assignments = cluster_assignments
         self.cluster_parameters = sample_chain.mean(axis=0)
         self.cluster_parameters_chain = sample_chain
 
-        return history
+        return sample_chain, self.cluster_assignments, history
 
 
     def plot_cluster_parameters(self):

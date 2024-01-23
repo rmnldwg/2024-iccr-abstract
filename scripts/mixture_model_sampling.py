@@ -7,6 +7,8 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+import matplotlib.pyplot as plt
+import h5py
 from lyscripts.utils import (
     load_patient_data,
     create_model_from_config,
@@ -28,8 +30,12 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to the patient data file.",
     )
     parser.add_argument(
-        "-m", "--models", type=Path, default="models/",
-        help="Directory for sampled models.",
+        "-m", "--model", type=Path, default="models/mixture.hdf5",
+        help="Path for sampled mixture model.",
+    )
+    parser.add_argument(
+        "-f", "--figure", type=Path, default="figures/mixture_history.png",
+        help="Path for figure over EM history.",
     )
     parser.add_argument(
         "-p", "--params", type=Path, default="_variables.yml",
@@ -44,6 +50,9 @@ def main():
 
     with open(args.params, mode="r", encoding="utf-8") as f:
         params = yaml.safe_load(f)
+        params["mixture_model"]["em_config"]["m_step"].update({
+            "imputation_function": lambda x: int(10 / 6 * x**1.1 +1)
+        })
 
     patient_data = load_patient_data(args.input)
     patient_data[SIMPLE_SUBSITE] = patient_data[SUBSITE].apply(simplify_subsite)
@@ -56,7 +65,7 @@ def main():
         lymph_model=lymph_model,
         n_clusters=params["mixture_model"]["num_clusters"],
         n_subpopulation=num_subsites,
-        name="test",
+        hdf5_output=args.model,
     )
     mixture_model.load_data(
         patient_data=patient_data,
@@ -69,7 +78,22 @@ def main():
     mixture_model.cluster_parameters = np.random.uniform(
         size=mixture_model.n_cluster_parameters
     )
-    print(mixture_model.mm_hmm_likelihood())
+
+    _chain, cluster_components, history = mixture_model.fit(
+        em_config=params["mixture_model"]["em_config"],
+        mcmc_config=params["mixture_model"]["mcmc_config"],
+    )
+    with h5py.File(args.model, mode="a") as h5_file:
+        if "em/cluster_components" in h5_file:
+            del h5_file["em/cluster_components"]
+        h5_file.create_dataset("em/cluster_components", data=cluster_components)
+    history.plot_history(
+        mixture_model.subpopulation_labels,
+        list(lymph_model.get_params(as_dict=True).keys()),
+        mixture_model.n_clusters,
+        None,
+    )
+    plt.savefig(args.figure)
 
 
 if __name__ == "__main__":

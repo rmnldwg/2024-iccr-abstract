@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 740ab8ef478b82a9d50415ea61b88aa5
-      size: 3674
+      md5: 4e1f7aef0557c85cebd0c08e242faa1c
+      size: 3562
     params:
       _variables.yml:
         barplot_kwargs:
@@ -111,7 +111,7 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 26b9e4edd92bdfcf52c4512412e5bb38
+      md5: 7ce60c0ba088bd3e382fdcedbed77d39
       size: 43272
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -305,9 +305,14 @@ stages:
       size: 19805
     - path: figures
       hash: md5
-      md5: a4a913242f0dd08aaae29cd5eda69d62.dir
-      size: 47669
-      nfiles: 8
+      md5: 07091770a8b46182b7a528f2239af149.dir
+      size: 105209
+      nfiles: 9
+    - path: models
+      hash: md5
+      md5: 83e77970a0ef1e4fc289fb17a25b9182.dir
+      size: 184479913
+      nfiles: 5
     - path: static
       hash: md5
       md5: 7f7cf86e0a573f41b69c4becfa4c1e19.dir
@@ -330,5 +335,53 @@ stages:
     outs:
     - path: content/manuscript.pdf
       hash: md5
-      md5: 7d1f803d7e46f89d2d6a10d04f7c93a2
-      size: 152244
+      md5: 326a365c44f63f0871e800958e0ea920
+      size: 152246
+  mixture_model_em_sampling:
+    cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
+      models/mixture.hdf5 --figure figures/mixture_history.png --params _variables.yml\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: scripts/mixture_model_sampling.py
+      hash: md5
+      md5: 827eff7d2e26636b34506b1c62eb4fcb
+      size: 3331
+    params:
+      _variables.yml:
+        mixture_model:
+          num_clusters: 2
+          em_config:
+            max_steps: 20
+            method: DEFAULT
+            verbose: false
+            e_step:
+              walkers_per_dim: 20
+              nsteps: 30
+              nburnin: 50
+              sampler: SIMPLE
+              show_progress: true
+            m_step:
+              minimize_method: SLSQP
+            convergence:
+              criterion: default
+              default:
+                lookback_period: 4
+                threshold: 0.015
+          mcmc_config:
+            sampler: SIMPLE
+            sampling_params:
+              walkers_per_dim: 20
+              nsteps: 1000
+              nburnin: 600
+    outs:
+    - path: figures/mixture_history.png
+      hash: md5
+      md5: e57bf6ae14f3feb645e3a77f580ab3c7
+      size: 57519
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 2c4de20fc064fec271a5d3402db78647
+      size: 60425400

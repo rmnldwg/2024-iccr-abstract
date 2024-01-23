@@ -14,7 +14,7 @@ from tueplots import figsizes, fontsizes
 from lyscripts.utils import load_patient_data
 from lyscripts.plot.utils import COLORS as USZ
 
-from scripts.helpers import simplify_subsite
+from helpers import simplify_subsite
 
 
 SUBSITE = ("tumor", "1", "subsite")
