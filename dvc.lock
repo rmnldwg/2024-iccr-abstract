@@ -111,7 +111,7 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 2ec0dbf27ba3c1e02a50d92fe3cddedf
+      md5: 26b9e4edd92bdfcf52c4512412e5bb38
       size: 43272
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -183,12 +183,6 @@ stages:
     params:
       _variables.yml:
         graph:
-          tumor:
-            primary:
-            - I
-            - II
-            - III
-            - IV
           lnl:
             I:
             - II
@@ -197,39 +191,45 @@ stages:
             III:
             - IV
             IV: []
+          tumor:
+            primary:
+            - I
+            - II
+            - III
+            - IV
         model:
-          first_binom_prob: 0.3
-          max_t: 10
-          t_stages:
-          - early
-          - late
           class: Unilateral
+          first_binom_prob: 0.3
           kwargs:
             base_symmetric: false
             trans_symmetric: true
             use_mixing: true
+          max_t: 10
+          t_stages:
+          - early
+          - late
         sampling:
-          walkers_per_dim: 20
           burnin: 1000
+          kwargs:
+            check_interval: 50
+            max_steps: 20000
+            rel_acor_threshold: 0.075
+            trust_threshold: 30.0
           nsteps: 20
           thin_by: 10
-          kwargs:
-            max_steps: 20000
-            check_interval: 50
-            trust_threshold: 30.0
-            rel_acor_threshold: 0.075
+          walkers_per_dim: 20
     outs:
     - path: figures/sample_from_oropharynx/accept_rates.csv
       hash: md5
-      md5: 2ab500de6f503299c73f0a0ea62fab28
-      size: 996
+      md5: b87183b99e9504e58bf5f900f41bd0e2
+      size: 929
     - path: figures/sample_from_oropharynx/acor_times.csv
       hash: md5
-      md5: adba9e138d1202b971b0b12db9be548a
-      size: 1027
+      md5: 64f4297aafe52518d12ce52df8b42119
+      size: 985
     - path: models/oropharynx.hdf5
       hash: md5
-      md5: d44f2bfe295ab8e8167ef4a718ff37a4
+      md5: de9cc1cf8d0e5d98113b88ff10862156
       size: 1604832
   sample_from_oral_cavity:
     cmd: "lyscripts sample data/oral_cavity.csv models/oral_cavity.hdf5 --params _variables.yml
@@ -243,12 +243,6 @@ stages:
     params:
       _variables.yml:
         graph:
-          tumor:
-            primary:
-            - I
-            - II
-            - III
-            - IV
           lnl:
             I:
             - II
@@ -257,39 +251,45 @@ stages:
             III:
             - IV
             IV: []
+          tumor:
+            primary:
+            - I
+            - II
+            - III
+            - IV
         model:
-          first_binom_prob: 0.3
-          max_t: 10
-          t_stages:
-          - early
-          - late
           class: Unilateral
+          first_binom_prob: 0.3
           kwargs:
             base_symmetric: false
             trans_symmetric: true
             use_mixing: true
+          max_t: 10
+          t_stages:
+          - early
+          - late
         sampling:
-          walkers_per_dim: 20
           burnin: 1000
+          kwargs:
+            check_interval: 50
+            max_steps: 20000
+            rel_acor_threshold: 0.075
+            trust_threshold: 30.0
           nsteps: 20
           thin_by: 10
-          kwargs:
-            max_steps: 20000
-            check_interval: 50
-            trust_threshold: 30.0
-            rel_acor_threshold: 0.075
+          walkers_per_dim: 20
     outs:
     - path: figures/sample_from_oral_cavity/accept_rates.csv
       hash: md5
-      md5: cc250dc25bf719e81a6013afd74da0de
-      size: 1207
+      md5: 74629fe00320df9ad3c83724b6fe824a
+      size: 1140
     - path: figures/sample_from_oral_cavity/acor_times.csv
       hash: md5
-      md5: a774ab62cda190fa559d406c86071a70
-      size: 1245
+      md5: 8dfac64602f65e248eab56239998f963
+      size: 1214
     - path: models/oral_cavity.hdf5
       hash: md5
-      md5: 0c506ef22449cc318cf102103096936a
+      md5: 7f39c66d0158a51342a5bd9edb3220b2
       size: 1604832
   render_pdf:
     cmd: "quarto render content/manuscript.qmd --to iccr-pdf\n"
@@ -305,8 +305,8 @@ stages:
       size: 19805
     - path: figures
       hash: md5
-      md5: 5dbc28e458a7f2edd7ddd99e2d37ec31.dir
-      size: 47876
+      md5: a4a913242f0dd08aaae29cd5eda69d62.dir
+      size: 47669
       nfiles: 8
     - path: static
       hash: md5
@@ -330,5 +330,5 @@ stages:
     outs:
     - path: content/manuscript.pdf
       hash: md5
-      md5: f109fb2094e4df09c275da89b4b5898c
-      size: 149198
+      md5: 7d1f803d7e46f89d2d6a10d04f7c93a2
+      size: 152244
