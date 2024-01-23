@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 from lyscripts.plot.utils import save_figure, get_size
-from scripts.lymixture.types import EMConfigType
-from lyscripts.sample import sample_from_global_model_and_configs
+from lymixture.types import EMConfigType
+# from lyscripts.sample import sample_from_global_model_and_configs
 
 global MODELS, N_CLUSTERS
 
@@ -53,7 +53,7 @@ def emcee_simple_sampler(
     )
 
     ar = np.mean(original_sampler_mp.acceptance_fraction)
-    print(f"Accepted {ar * 100 :.2f} % of samples.")
+    logger.info(f"Accepted {ar * 100 :.2f} % of samples.")
     samples = original_sampler_mp.get_chain(flat=True, discard=burnin)
     log_probs = original_sampler_mp.get_log_prob(flat=True)
     end_point = original_sampler_mp.get_last_sample()[0]
@@ -284,7 +284,7 @@ class ExpectationMaximization:
 
 
     def run_em(self):
-        print(f"Run EM with method {self.em_config['method']} for max {self.max_steps} steps.")
+        logger.info(f"Run EM with method {self.em_config['method']} for max {self.max_steps} steps.")
         self.init_run_em()
 
         # Run the EM algorithm.
@@ -313,19 +313,19 @@ class ExpectationMaximization:
             self.history.save(save_dir=self.em_dir)
 
             if converged:
-                print(f"Step {self.current_step} / {self.max_steps}: Converged!")
+                logger.info(f"Step {self.current_step} / {self.max_steps}: Converged!")
                 break
 
             self.current_step = iteration
 
         if not converged:
-            print("Max steps reached, no convergence, return current approximation.")
+            logger.info("Max steps reached, no convergence, return current approximation.")
 
         return self.current_cluster_assignments, self.history
 
 
     def e_step(self):
-        print(f"Step {self.current_step}: Perform expectation.")
+        logger.info(f"Step {self.current_step}: Perform expectation.")
         # Set the cluster parameters to the current estimates.
         self.lmm.cluster_parameters = self.current_cluster_parameters
         # self.lmm.diagnose_matrices
@@ -340,11 +340,11 @@ class ExpectationMaximization:
             self.lmm.n_cluster_assignments,
             initial_guess=self.emcee_end_point,
         )
-        # print(cluster_assignments_posterior)
+        # logger.info(cluster_assignments_posterior)
         # raise
         self.current_cluster_assignments = cluster_assignments_posterior.mean(axis=0)
         self.current_cluster_assignments_posterior = cluster_assignments_posterior
-        print(f"Expectation yields: {self.current_cluster_assignments}")
+        logger.info(f"Expectation yields: {self.current_cluster_assignments}")
 
 
     def m_step(self):
@@ -353,7 +353,7 @@ class ExpectationMaximization:
         This means it takes imputations from the cluster assignment posterior,
         and returns the cluster parameters which maximize the likelihood over all imputations.
         """
-        print(f"Step {self.current_step}: Perform maximation.")
+        logger.info(f"Step {self.current_step}: Perform maximation.")
         log_prob_fn = log_ll_cl_parameters_multiple_assignments
 
         # Draw m imputations from the estimated posterior of the cluster assignments
@@ -362,7 +362,7 @@ class ExpectationMaximization:
             self.em_config["m_step"]["imputation_function"](self.current_step),
         )
 
-        print(f"Number of imputations: {len(cluster_assignment_imputations)}")
+        logger.info(f"Number of imputations: {len(cluster_assignment_imputations)}")
         cluster_parameter_proposal, max_llh = self.maximize_estimation(
             log_prob_fn,
             self.lmm.n_cluster_parameters,
@@ -372,7 +372,7 @@ class ExpectationMaximization:
 
         self.current_cluster_parameters = cluster_parameter_proposal
         self.current_likelihood = max_llh
-        print(f"Maximation yields: {self.current_cluster_parameters}")
+        logger.info(f"Maximation yields: {self.current_cluster_parameters}")
 
 
     def e_step_sampling_cluster_parameters(self):
@@ -380,7 +380,7 @@ class ExpectationMaximization:
         This implements the E-Step of the EM algorithm in the 'inverted' method, where
         we sample for the cluster parameters given the current cluster assignments.
         """
-        print(f"Step {self.current_step}: Perform expectation.")
+        logger.info(f"Step {self.current_step}: Perform expectation.")
         # Set the cluster parameters to the current estimates. This triggers recomputation of the matrices.
         self.lmm.cluster_assignments = self.current_cluster_assignments
 
@@ -404,7 +404,7 @@ class ExpectationMaximization:
         we sample m imputations from the cl parameter posterior and find the cluster
         assignments which maximize the Q-function.
         """
-        print(f"Step {self.current_step}: Perform maximation.")
+        logger.info(f"Step {self.current_step}: Perform maximation.")
 
         log_prob_fn = log_ll_cl_assignments_multiple_parameters
 
@@ -422,7 +422,7 @@ class ExpectationMaximization:
         )
         self.current_cluster_assignments = cluster_assignment_proposal
         self.current_likelihood = max_llh
-        print(f"Maximation yields: {self.current_cluster_assignments}")
+        logger.info(f"Maximation yields: {self.current_cluster_assignments}")
 
 
     @staticmethod

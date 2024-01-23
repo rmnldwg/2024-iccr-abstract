@@ -14,6 +14,8 @@ from tueplots import figsizes, fontsizes
 from lyscripts.utils import load_patient_data
 from lyscripts.plot.utils import COLORS as USZ
 
+from scripts.helpers import simplify_subsite
+
 
 SUBSITE = ("tumor", "1", "subsite")
 LOCATION = ("tumor", "1", "location")
@@ -40,11 +42,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to the parameter file. Looks for a key `barplot_kwargs`.",
     )
     return parser
-
-
-def simplify_subsite(icd_code: str) -> str:
-    """Only use the part of the ICD code before the decimal point."""
-    return icd_code.split(".")[0]
 
 
 def generate_location_colors(

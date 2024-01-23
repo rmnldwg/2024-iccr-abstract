@@ -71,6 +71,8 @@ num_patients:
   C09: 452
   C10: 169
   total: 1242
+mixture_model:
+  num_clusters: 2
 sampling:
   burnin: 1000
   kwargs:

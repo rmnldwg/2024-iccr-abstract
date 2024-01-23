@@ -199,10 +199,10 @@ def create_prev_vectors(
         if ax is None:
             plt.show()
     if len(states_all) > 4:
-        print(f"Prev Vector: {X_inv_list}")
+        logger.info(f"Prev Vector: {X_inv_list}")
     else:
         prev_formatted = "".join(f"{l}: {p}" for l, p in zip(states_all, X_inv_list))
-        print(f"Prev Vector: {prev_formatted}")
+        logger.info(f"Prev Vector: {prev_formatted}")
     return X_inv_list
 
 
@@ -243,7 +243,7 @@ def convert_params(params, n_clusters, n_subsites):
 def emcee_sampling(llh_function, n_params, sample_name, llh_args=None):
     nwalkers, nstep, burnin = 20 * n_params, 1000, 1500
     thin_by = 1
-    print(f"Dimension: {n_params} with n walkers: {nwalkers}")
+    logger.info(f"Dimension: {n_params} with n walkers: {nwalkers}")
     output_name = sample_name
 
     if False:
@@ -252,7 +252,7 @@ def emcee_sampling(llh_function, n_params, sample_name, llh_args=None):
         created_pool = mp.Pool(os.cpu_count())
         with created_pool as pool:
             starting_points = np.random.uniform(size=(nwalkers, n_params))
-            print(
+            logger.info(
                 f"Start Burning (steps = {burnin}) with {created_pool._processes} cores"
             )
             burnin_sampler = emcee.EnsembleSampler(
@@ -267,11 +267,11 @@ def emcee_sampling(llh_function, n_params, sample_name, llh_args=None):
             )
 
             ar = np.mean(burnin_sampler.acceptance_fraction)
-            print(
+            logger.info(
                 f"the HMM sampler for model 01 accepted {ar * 100 :.2f} % of samples."
             )
             last_sample = burnin_sampler.get_last_sample()[0]
-            print(f"The shape of the last sample is {last_sample.shape}")
+            logger.info(f"The shape of the last sample is {last_sample.shape}")
             starting_points = np.random.uniform(size=(nwalkers, n_params))
             original_sampler_mp = emcee.EnsembleSampler(
                 nwalkers,
@@ -286,7 +286,7 @@ def emcee_sampling(llh_function, n_params, sample_name, llh_args=None):
             )
 
         ar = np.mean(original_sampler_mp.acceptance_fraction)
-        print(f"the HMM sampler for model accepted {ar * 100 :.2f} % of samples.")
+        logger.info(f"the HMM sampler for model accepted {ar * 100 :.2f} % of samples.")
         samples = original_sampler_mp.get_chain(flat=True)
         np.save(f"./samples/" + output_name, samples)
         # plots["acor_times"].append(burnin_info["acor_times"][-1])
@@ -308,7 +308,7 @@ def emcee_sampling_ext(
     burnin = 1000 if n_burnin is None else n_burnin
     nstep = 1000 if n_step is None else n_step
     thin_by = 1
-    print(f"Dimension: {n_params} with n walkers: {nwalkers}")
+    logger.info(f"Dimension: {n_params} with n walkers: {nwalkers}")
     output_name = sample_name
 
     if False:
@@ -325,7 +325,7 @@ def emcee_sampling_ext(
                     starting_points = np.tile(start_with, (nwalkers, 1))
                 else:
                     starting_points = start_with
-            print(
+            logger.info(
                 f"Start Burning (steps = {burnin}) with {created_pool._processes} cores"
             )
             burnin_sampler = emcee.EnsembleSampler(
@@ -340,11 +340,11 @@ def emcee_sampling_ext(
             )
 
             ar = np.mean(burnin_sampler.acceptance_fraction)
-            print(
+            logger.info(
                 f"the HMM sampler for model 01 accepted {ar * 100 :.2f} % of samples."
             )
             starting_points = burnin_sampler.get_last_sample()[0]
-            # print(f"The shape of the last sample is {starting_points.shape}")
+            # logger.info(f"The shape of the last sample is {starting_points.shape}")
             original_sampler_mp = emcee.EnsembleSampler(
                 nwalkers,
                 n_params,
@@ -361,7 +361,7 @@ def emcee_sampling_ext(
             )
 
         ar = np.mean(original_sampler_mp.acceptance_fraction)
-        print(f"the HMM sampler for model accepted {ar * 100 :.2f} % of samples.")
+        logger.info(f"the HMM sampler for model accepted {ar * 100 :.2f} % of samples.")
         samples = original_sampler_mp.get_chain(flat=True)
         log_probs = original_sampler_mp.get_log_prob(flat=True)
         end_point = original_sampler_mp.get_last_sample()[0]
@@ -554,7 +554,7 @@ def load_data(datasets_names, logger=None):
     if logger:
         logger.info(f"Succesfully loaded {len(dataset)} Patients")
     else:
-        print(f"Succesfully loaded {len(dataset)} Patients")
+        logger.info(f"Succesfully loaded {len(dataset)} Patients")
     return dataset
 
 
@@ -617,7 +617,7 @@ def plot_histograms(data_in, states, single_line, loc, colors, bins=50, plot_pat
             color=list(colors.values())
         )
         line_cycl = cycler(linestyle=["-", "--"]) * cycler(color=list(colors.values()))
-        print("Set up figure")
+        logger.info("Set up figure")
 
         values = []
         labels = []
@@ -659,7 +659,7 @@ def plot_histograms(data_in, states, single_line, loc, colors, bins=50, plot_pat
             ax.legend()
             ax.set_xlabel("probability [%]")
         ax.set_title(f"{state}", fontsize="small", fontweight="regular")
-        print(f"Plotted {len(values)} histograms")
+        logger.info(f"Plotted {len(values)} histograms")
         if plot_path is None:
             plt.savefig(PLOT_PATH / f"hist_{loc}_{state}.png")
         else:
