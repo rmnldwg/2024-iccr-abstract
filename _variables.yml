@@ -75,7 +75,7 @@ mixture_model:
   num_clusters: 2
   em_config:
     max_steps: 20
-    method: DEFAULT
+    method: INVERTED
     verbose: False
     e_step:
       walkers_per_dim: 20

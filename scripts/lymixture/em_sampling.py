@@ -10,6 +10,7 @@ from matplotlib.ticker import MaxNLocator
 
 from lyscripts.plot.utils import save_figure, get_size
 from lymixture.types import EMConfigType
+from lymixture.utils import sample_from_global_model_and_configs
 # from lyscripts.sample import sample_from_global_model_and_configs
 
 global MODELS, N_CLUSTERS
@@ -212,9 +213,7 @@ class ExpectationMaximization:
                 ndim,
                 sampling_params=self.em_config["e_step"],
                 starting_point=initial_guess,
-                save_dir=self.em_dir,
                 models=LMM,
-                llh_args=llh_args,
                 verbose=self.em_config["e_step"]["show_progress"]
                 & self.em_config["verbose"],
             )

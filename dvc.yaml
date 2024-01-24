@@ -168,4 +168,4 @@ stages:
           - model.max_t
           - num_patients
     outs:
-      - content/manuscript.pdf
+      - _site/content/manuscript.pdf

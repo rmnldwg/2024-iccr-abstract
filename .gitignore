@@ -179,3 +179,4 @@ pyrightconfig.json
 /.quarto/
 /content/*
 !/content/*.qmd
+/_site/

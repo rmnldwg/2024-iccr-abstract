@@ -72,12 +72,6 @@ def main():
         split_by=SIMPLE_SUBSITE,
         mapping=lambda x: "all",
     )
-    mixture_model.cluster_assignments = np.zeros(shape=(
-        mixture_model.n_subpopulation * (mixture_model.n_clusters - 1)
-    )) + 0.2
-    mixture_model.cluster_parameters = np.random.uniform(
-        size=mixture_model.n_cluster_parameters
-    )
 
     _chain, cluster_components, history = mixture_model.fit(
         em_config=params["mixture_model"]["em_config"],

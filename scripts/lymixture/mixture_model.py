@@ -33,6 +33,7 @@ from lymixture.mm_plotting import (
     plot_cluster_assignments,
     plot_cluster_parameters,
 )
+from lymixture.utils import sample_from_global_model_and_configs
 # pylint: disable=logging-fstring-interpolation
 
 
@@ -374,10 +375,8 @@ class LymphMixtureModel:
                 ndim=self.n_cluster_parameters,
                 sampling_params=sampling_params,
                 starting_point=None,
-                hdf5_backend=hdf5_backend,
-                save_dir=self.samples_dir,
+                backend=hdf5_backend,
                 models=self,
-                verbose=True,
             )
 
         return sample_chain, end_point, log_probs
