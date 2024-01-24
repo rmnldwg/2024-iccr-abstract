@@ -19,6 +19,9 @@ jobs:
         with:
           version: 1.4.537
 
+      - name: Install rsvg
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
