@@ -61,12 +61,13 @@ def main():
         alpha=0.7,
         linewidths=0.,
     )
-    bottom_ax.set_xlabel("assignment to cluster A")
+    bottom_ax.set_xlabel("assignment to cluster A [%]")
+    bottom_ax.set_xticklabels([f"{int(tick):.2%}" for tick in bottom_ax.get_xticks()])
     top_ax = bottom_ax.secondary_xaxis(
         location="top",
         functions=(lambda x: 1. - x, lambda x: 1. - x),
     )
-    top_ax.set_xlabel("assignment to cluster B")
+    top_ax.set_xlabel("assignment to cluster B [%]")
     plt.savefig(args.output, bbox_inches="tight", dpi=300)
 
 

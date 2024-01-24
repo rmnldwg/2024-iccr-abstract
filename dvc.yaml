@@ -141,7 +141,7 @@ stages:
       python scripts/mixture_model_sampling.py
       --input data/enhanced.csv
       --model models/mixture.hdf5
-      --figure figures/mixture_history.png
+      --figure figures/mixture_history.svg
       --params _variables.yml
     deps:
       - scripts/mixture_model_sampling.py
@@ -150,8 +150,23 @@ stages:
       - _variables.yml:
           - mixture_model
     outs:
-      - figures/mixture_history.png
+      - figures/mixture_history.svg
       - models/mixture.hdf5
+
+  plot_cluster_assignments:
+    cmd: >
+      python scripts/plot_cluster_assignments.py
+      --model models/mixture.hdf5
+      --output figures/cluster_assignments.svg
+      --params _variables.yml
+    deps:
+      - models/mixture.hdf5
+      - scripts/plot_cluster_assignments.py
+    params:
+      - _variables.yml:
+          - num_patients
+    outs:
+      - figures/cluster_assignments.svg
 
   render_pdf:
     cmd: >

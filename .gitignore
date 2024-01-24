@@ -180,3 +180,4 @@ pyrightconfig.json
 /content/*
 !/content/*.qmd
 /_site/
+/site_libs/

@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 4e1f7aef0557c85cebd0c08e242faa1c
-      size: 3562
+      md5: 42020dd1b25b640533101cb5bdfc9b73
+      size: 3539
     params:
       _variables.yml:
         barplot_kwargs:
@@ -111,7 +111,7 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 5923c029cff89ec5e55f9f937d93d09c
+      md5: ece62fb1384cebcbfcf808651cb9d382
       size: 43272
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -301,16 +301,16 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: 191a41557e811969c90e73e5357a3e04
-      size: 19805
+      md5: 0ea38b29b0bf5670660cd1b4ebba6a83
+      size: 20035
     - path: figures
       hash: md5
-      md5: e89546709ae87334fb2752090b442e04.dir
-      size: 105157
-      nfiles: 9
+      md5: 9c8bcceb0994e15b4005e5426fd4373e.dir
+      size: 256505
+      nfiles: 12
     - path: models
       hash: md5
-      md5: 886dcec01dff00ccb5e15d61aa4b69c0.dir
+      md5: f8c46ba8972bcbfebe793cfba13bcb7b.dir
       size: 63635113
       nfiles: 4
     - path: static
@@ -335,11 +335,11 @@ stages:
     outs:
     - path: _site/content/manuscript.pdf
       hash: md5
-      md5: 655e726f63ad24b1de447c10046aa862
-      size: 149191
+      md5: 767bc3b81e54ab71749da9e8a277de06
+      size: 178634
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
-      models/mixture.hdf5 --figure figures/mixture_history.png --params _variables.yml\n"
+      models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml\n"
     deps:
     - path: data/enhanced.csv
       hash: md5
@@ -377,11 +377,40 @@ stages:
               nsteps: 1000
               nburnin: 600
     outs:
-    - path: figures/mixture_history.png
+    - path: figures/mixture_history.svg
       hash: md5
-      md5: d00865e644a980134f33ede847e16c63
-      size: 57467
+      md5: 973c2b33ffb268e3fabfc81381e191f8
+      size: 74683
     - path: models/mixture.hdf5
       hash: md5
-      md5: 7667025c8802edf7e3abd7fc7a7e705b
+      md5: fd10922578516d307695d2d20eaca3c2
       size: 60425400
+  plot_cluster_assignments:
+    cmd: "python scripts/plot_cluster_assignments.py --model models/mixture.hdf5 --output
+      figures/cluster_assignments.svg --params _variables.yml\n"
+    deps:
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: fd10922578516d307695d2d20eaca3c2
+      size: 60425400
+    - path: scripts/plot_cluster_assignments.py
+      hash: md5
+      md5: 06aa88646cd12c0a78e4deadda66bd1c
+      size: 2364
+    params:
+      _variables.yml:
+        num_patients:
+          C01: 212
+          C02: 158
+          C03: 45
+          C04: 99
+          C05: 61
+          C06: 46
+          C09: 452
+          C10: 169
+          total: 1242
+    outs:
+    - path: figures/cluster_assignments.svg
+      hash: md5
+      md5: 59322b28157d6058c8d7f95fd29e7543
+      size: 32233

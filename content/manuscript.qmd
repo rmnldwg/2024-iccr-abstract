@@ -300,6 +300,8 @@ In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in 
 
 Works super well, of course!
 
+![Assignment of each subsite to each of the two clusters. The fruther left a subsite, the more it is assigned to cluster A, the further right, the more to cluster B.](../figures/cluster_assignments.svg){#fig-cluster-assignments}
+
 
 # Discussion {#sec-discussion}
 
