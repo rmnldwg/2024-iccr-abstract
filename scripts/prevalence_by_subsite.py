@@ -14,7 +14,7 @@ from tueplots import figsizes, fontsizes
 from lyscripts.utils import load_patient_data
 from lyscripts.plot.utils import COLORS as USZ
 
-from helpers import simplify_subsite
+from helpers import simplify_subsite, OROPHARYNX_ICDS
 
 
 SUBSITE = ("tumor", "1", "subsite")
@@ -23,7 +23,6 @@ LNL_I = ("max_llh", "ipsi", "I")
 LNL_II = ("max_llh", "ipsi", "II")
 LNL_III = ("max_llh", "ipsi", "III")
 LNL_IV = ("max_llh", "ipsi", "IV")
-OROPHARYNX_ICDS = ["C01", "C09", "C10"]
 
 
 def create_parser() -> argparse.ArgumentParser:
