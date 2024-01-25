@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 5f8229064c97508ee023e9145d2672ff
-      size: 2765
+      md5: 130de8249b34fd7065b6d9999dffa81a
+      size: 2623
     params:
       _variables.yml:
         barplot_kwargs:
@@ -111,7 +111,7 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 30400a92b1479c0a70e7e69d84a9e673
+      md5: ba71fe44bde13d432718dcb881276e98
       size: 46350
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -119,8 +119,8 @@ stages:
     deps:
     - path: scripts/write_num_patients.py
       hash: md5
-      md5: f096621524dd445e6df56ba2d8c3bc19
-      size: 1422
+      md5: 344f827d3bd6d36a4f3f38f8b3d3f79f
+      size: 1413
     params:
       _variables.yml:
         icd_code_map:
@@ -205,6 +205,12 @@ stages:
             trans_symmetric: true
             use_mixing: true
           max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
           t_stages:
           - all
         sampling:
@@ -220,15 +226,15 @@ stages:
     outs:
     - path: figures/sample_from_oropharynx/accept_rates.csv
       hash: md5
-      md5: 9610d43ea98a29043f5b54fc12e1390f
-      size: 504
+      md5: 345a4c20acbd9490bfdfbe29ef9ad8af
+      size: 943
     - path: figures/sample_from_oropharynx/acor_times.csv
       hash: md5
-      md5: 073b38c669c95603c9905129ebd022d0
-      size: 482
+      md5: 543ad2e8c6f4129494239bc0812abb7f
+      size: 932
     - path: models/oropharynx.hdf5
       hash: md5
-      md5: b5b17c24c6427735d181e387cd62443b
+      md5: 23acf157edb04fc27f33f60456ac189b
       size: 1454016
   sample_from_oral_cavity:
     cmd: "lyscripts sample data/oral_cavity.csv models/oral_cavity.hdf5 --params _variables.yml
@@ -264,6 +270,12 @@ stages:
             trans_symmetric: true
             use_mixing: true
           max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
           t_stages:
           - all
         sampling:
@@ -279,15 +291,15 @@ stages:
     outs:
     - path: figures/sample_from_oral_cavity/accept_rates.csv
       hash: md5
-      md5: 9610d43ea98a29043f5b54fc12e1390f
-      size: 504
+      md5: 76715bfe8f35a22dde3fa80340695c99
+      size: 1087
     - path: figures/sample_from_oral_cavity/acor_times.csv
       hash: md5
-      md5: 073b38c669c95603c9905129ebd022d0
-      size: 482
+      md5: 8bb9a377b2b9807586614a8d7474f97c
+      size: 1068
     - path: models/oral_cavity.hdf5
       hash: md5
-      md5: b5b17c24c6427735d181e387cd62443b
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
       size: 1454016
   render_pdf:
     cmd: "quarto render\n"
@@ -303,12 +315,12 @@ stages:
       size: 19034
     - path: figures
       hash: md5
-      md5: 7a0100a57029da3ce6a6a163e238f233.dir
-      size: 215327
+      md5: 81acc678df2048ebd911ea7746c0dbb5.dir
+      size: 219625
       nfiles: 11
     - path: models
       hash: md5
-      md5: e8e7fdd5dbb764ea9898f529f3aef46d.dir
+      md5: f2ccc255b711f8fe2df16ba4e9294662.dir
       size: 63333481
       nfiles: 4
     - path: static
@@ -333,8 +345,8 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: c7e500dca168005f24dfb735cdb690aa.dir
-      size: 1841940
+      md5: c98e9d208ab768ff806ebc2d4f766ed1.dir
+      size: 1841894
       nfiles: 22
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
@@ -346,8 +358,8 @@ stages:
       size: 997595
     - path: scripts/mixture_model_sampling.py
       hash: md5
-      md5: 303cd47bf17592e4edade6e056687edc
-      size: 2998
+      md5: 94b528ef0cabe15ab8ee2a505ebb9c26
+      size: 2971
     params:
       _variables.yml:
         mixture_model:
@@ -378,11 +390,11 @@ stages:
     outs:
     - path: figures/mixture_history.svg
       hash: md5
-      md5: 7e6180bc8482164e9114dc6341cedc2c
-      size: 69287
+      md5: 5eeada2be1fd7492963599b4a688aac6
+      size: 71505
     - path: models/mixture.hdf5
       hash: md5
-      md5: 2aeb04cd4e3694d8e6fc2364f6ce160a
+      md5: 6643ea7481f66c8b039ac02d2c806f51
       size: 60425400
   plot_cluster_assignments:
     cmd: "python scripts/plot_cluster_assignments.py --model models/mixture.hdf5 --output
@@ -390,7 +402,7 @@ stages:
     deps:
     - path: models/mixture.hdf5
       hash: md5
-      md5: 2aeb04cd4e3694d8e6fc2364f6ce160a
+      md5: 6643ea7481f66c8b039ac02d2c806f51
       size: 60425400
     - path: scripts/plot_cluster_assignments.py
       hash: md5
@@ -411,5 +423,5 @@ stages:
     outs:
     - path: figures/cluster_assignments.svg
       hash: md5
-      md5: a55c1c66b19644fe2f2418a4ed470d84
-      size: 38099
+      md5: 781a1307f6b8ba8688ec9e6f54fe3ebb
+      size: 38121

@@ -7,8 +7,7 @@ import yaml
 
 from lyscripts.utils import load_patient_data
 
-
-SUBSITE = ("tumor", "1", "subsite")
+from helpers import SUBSITE
 
 
 def create_parser() -> argparse.ArgumentParser:

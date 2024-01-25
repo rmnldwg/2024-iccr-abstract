@@ -9,6 +9,16 @@ from matplotlib.colors import to_rgba
 
 
 OROPHARYNX_ICDS = ["C01", "C09", "C10"]
+SUBSITE = ("tumor", "1", "subsite")
+SIMPLE_SUBSITE = ("tumor", "1", "simple_subsite")
+LOCATION = ("tumor", "1", "location")
+T_STAGE = ("tumor", "1", "t_stage")
+LNLS = ["I", "II", "III", "IV"]
+LNL_I = ("max_llh", "ipsi", "I")
+LNL_II = ("max_llh", "ipsi", "II")
+LNL_III = ("max_llh", "ipsi", "III")
+LNL_IV = ("max_llh", "ipsi", "IV")
+
 
 def simplify_subsite(icd_code: str) -> str:
     """Only use the part of the ICD code before the decimal point."""

@@ -83,6 +83,12 @@ model:
     trans_symmetric: true
     use_mixing: true
   max_t: 10
+  t_stage_mapping:
+    0: all
+    1: all
+    2: all
+    3: all
+    4: all
   t_stages:
   - all
 num_patients:

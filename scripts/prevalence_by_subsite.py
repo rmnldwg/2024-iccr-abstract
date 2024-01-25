@@ -11,15 +11,15 @@ import matplotlib.pyplot as plt
 from tueplots import figsizes, fontsizes
 from lyscripts.utils import load_patient_data
 
-from helpers import simplify_subsite, generate_location_colors
-
-
-SUBSITE = ("tumor", "1", "subsite")
-LOCATION = ("tumor", "1", "location")
-LNL_I = ("max_llh", "ipsi", "I")
-LNL_II = ("max_llh", "ipsi", "II")
-LNL_III = ("max_llh", "ipsi", "III")
-LNL_IV = ("max_llh", "ipsi", "IV")
+from helpers import (
+    simplify_subsite,
+    generate_location_colors,
+    SUBSITE,
+    LNL_I,
+    LNL_II,
+    LNL_III,
+    LNL_IV,
+)
 
 
 def create_parser() -> argparse.ArgumentParser:

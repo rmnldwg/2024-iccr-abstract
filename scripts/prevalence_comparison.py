@@ -16,11 +16,8 @@ from lyscripts.predict.prevalences import (
     generate_predicted_prevalences,
 )
 
-from helpers import str2bool, OROPHARYNX_ICDS
+from helpers import str2bool, OROPHARYNX_ICDS, SUBSITE, T_STAGE, LNLS
 
-
-T_STAGE = ("tumor", "1", "t_stage")
-LNLS = ["I", "II", "III", "IV"]
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -80,11 +77,13 @@ def main():
     patient_data[T_STAGE] = ["all"] * len(patient_data)
 
     if args.subsite in OROPHARYNX_ICDS:
+        print("using oropharynx model")
         indie_chain = HDFBackend(
             args.mixture_model.parent / "oropharynx.hdf5",
             read_only=True,
         ).get_chain(flat=True, thin=args.thin_indie)
     else:
+        print("using oral cavity model")
         indie_chain = HDFBackend(
             args.mixture_model.parent / "oral_cavity.hdf5",
             read_only=True,
@@ -95,10 +94,13 @@ def main():
     ).get_chain(flat=True, thin=args.thin_mixture)
     with h5py.File(args.mixture_model, mode="r") as h5_file:
         cluster_assignments = h5_file["em/cluster_components"][...]
+    idx = list(params["icd_code_map"].keys()).index(args.subsite)
+    cluster_A_prob = cluster_assignments[idx]
+    cluster_B_prob = 1 - cluster_A_prob
 
     matching, total = compute_observed_prevalence(
         pattern=pattern,
-        data=patient_data,
+        data=patient_data.loc[patient_data[SUBSITE].str.contains(args.subsite)],
         lnls=LNLS,
         t_stage="all",
         modality="max_llh",
@@ -114,14 +116,25 @@ def main():
     cluster_A_prevs = np.array(list(generate_predicted_prevalences(
         pattern=pattern,
         model=lymph_model,
-        samples=mixture_chain,
+        samples=mixture_chain[:,:7],
         t_stage="all",
         modality_spsn=[1., 1.],
     )))
+    cluster_B_prevs = np.array(list(generate_predicted_prevalences(
+        pattern=pattern,
+        model=lymph_model,
+        samples=mixture_chain[:,7:],
+        t_stage="all",
+        modality_spsn=[1., 1.],
+    )))
+    mixture_model_prevs = (
+        cluster_A_prob * cluster_A_prevs
+        + cluster_B_prob * cluster_B_prevs
+    )
 
-    print(f"Observed prevalence: {matching} out of {total}")
-    print(f"Predicted prevalence: {mixture_model_prevs.mean():.3f}")
-    print(f"Independent model prevalence: {independent_prevs.mean():.3f}")
+    print(f"Observed prevalence:    {matching / total:.2%}")
+    print(f"Independent prevalence: {independent_prevs.mean():.2%}")
+    print(f"Mixture prevalence:     {mixture_model_prevs.mean():.2%}")
 
 if __name__ == "__main__":
     main()

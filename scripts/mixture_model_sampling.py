@@ -14,14 +14,11 @@ from lyscripts.utils import (
     create_model_from_config,
 )
 
-from helpers import simplify_subsite
+from helpers import simplify_subsite, SUBSITE, SIMPLE_SUBSITE
 from lymixture.mixture_model import LymphMixtureModel
 
 
 SUBSITE = ("tumor", "1", "subsite")
-SIMPLE_SUBSITE = ("tumor", "1", "simple_subsite")
-
-
 def create_parser() -> argparse.ArgumentParser:
     """Assemble the parser for the command line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
