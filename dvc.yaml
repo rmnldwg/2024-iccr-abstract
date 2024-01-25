@@ -170,7 +170,7 @@ stages:
 
   render_pdf:
     cmd: >
-      quarto render content/manuscript.qmd --to iccr-pdf
+      quarto render
     deps:
       - content/manuscript.qmd
       - _extensions
@@ -183,4 +183,4 @@ stages:
           - model.max_t
           - num_patients
     outs:
-      - _site/content/manuscript.pdf
+      - _site/

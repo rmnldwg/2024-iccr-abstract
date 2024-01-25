@@ -3,15 +3,16 @@ Visualize the cluster assignments of the trained mixture model.
 """
 import argparse
 from pathlib import Path
+from matplotlib.ticker import StrMethodFormatter
+import numpy as np
 import yaml
 
 import h5py
 import matplotlib.pyplot as plt
-from matplotlib.colors import to_rgba
 from tueplots import figsizes, fontsizes
 from lyscripts.plot.utils import COLORS as USZ
 
-from helpers import OROPHARYNX_ICDS
+from helpers import generate_location_colors
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -50,24 +51,48 @@ def main():
     plt.rcParams.update(fontsizes.icml2022())
 
     _, bottom_ax = plt.subplots()
+    cluster_x = [cluster_components[i] for i, _ in enumerate(num_patients.keys())]
+    cluster_y = [0. for _ in num_patients.keys()]
+    annotations = [f"{label}\n({num})" for label, num in num_patients.items()]
     bottom_ax.scatter(
-        [cluster_components[i] for i, _ in enumerate(num_patients.keys())],
-        [0. for _ in num_patients.keys()],
+        cluster_x, cluster_y,
         s=[num for num in num_patients.values()],
-        c=[
-            to_rgba(USZ["orange"] if i in OROPHARYNX_ICDS else USZ["blue"], alpha=0.7)
-            for i in num_patients.keys()
-        ],
+        c=list(generate_location_colors(num_patients.keys())),
         alpha=0.7,
         linewidths=0.,
+        zorder=10,
     )
-    bottom_ax.set_xlabel("assignment to cluster A [%]")
-    bottom_ax.set_xticklabels([f"{int(tick):.2%}" for tick in bottom_ax.get_xticks()])
+
+    sorted_idx = cluster_components.argsort()
+    sorted_x = cluster_components[sorted_idx]
+    sorted_annotations = [annotations[i] for i in sorted_idx]
+    sorted_num = [list(num_patients.values())[i] for i in sorted_idx]
+    for i, (x, num, annotation) in enumerate(zip(sorted_x, sorted_num, sorted_annotations)):
+        bottom_ax.annotate(
+            annotation,
+            # sqrt, because marker's area grows linearly with patient num, not radius
+            xy=(x, np.sqrt(0.0000003 * num) * (- 1)**i),
+            xytext=(x, 0.025 * (- 1)**i),
+            ha="center",
+            va="bottom" if i % 2 == 0 else "top",
+            fontsize="small",
+            arrowprops={
+                "arrowstyle": "-",
+                "color": USZ["gray"],
+                "linewidth": 1.,
+            }
+        )
+
+    bottom_ax.set_xlabel("assignment to cluster B")
+    bottom_ax.xaxis.set_major_formatter(StrMethodFormatter("{x:.0%}"))
     top_ax = bottom_ax.secondary_xaxis(
         location="top",
         functions=(lambda x: 1. - x, lambda x: 1. - x),
     )
-    top_ax.set_xlabel("assignment to cluster B [%]")
+    top_ax.set_xlabel("assignment to cluster A")
+    top_ax.xaxis.set_major_formatter(StrMethodFormatter("{x:.0%}"))
+    bottom_ax.set_yticks([])
+    bottom_ax.grid(axis="x", alpha=0.5, color=USZ["gray"], linestyle=":")
     plt.savefig(args.output, bbox_inches="tight", dpi=300)
 
 

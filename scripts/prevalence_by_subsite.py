@@ -5,16 +5,13 @@ location (different colors).
 """
 import argparse
 from pathlib import Path
-from typing import Generator
 import yaml
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import to_rgba
 from tueplots import figsizes, fontsizes
 from lyscripts.utils import load_patient_data
-from lyscripts.plot.utils import COLORS as USZ
 
-from helpers import simplify_subsite, OROPHARYNX_ICDS
+from helpers import simplify_subsite, generate_location_colors
 
 
 SUBSITE = ("tumor", "1", "subsite")
@@ -41,27 +38,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to the parameter file. Looks for a key `barplot_kwargs`.",
     )
     return parser
-
-
-def generate_location_colors(
-    icd_codes: list[str],
-    delta_alpha: float = 0.15,
-) -> Generator[tuple[float, float, float, float], None, None]:
-    """Make a list of colors for each location."""
-    oropharynx_alpha = 1.0
-    oral_cavity_alpha = 1.0
-    colors, alphas = [], []
-    for icd_code in icd_codes:
-        if icd_code in OROPHARYNX_ICDS:
-            colors.append(USZ["orange"])
-            alphas.append(oropharynx_alpha)
-            oropharynx_alpha -= delta_alpha
-            yield to_rgba(USZ["orange"], oropharynx_alpha)
-        else:
-            colors.append(USZ["blue"])
-            alphas.append(oral_cavity_alpha)
-            oral_cavity_alpha -= delta_alpha
-            yield to_rgba(USZ["blue"], oral_cavity_alpha)
 
 
 def main():

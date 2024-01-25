@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 42020dd1b25b640533101cb5bdfc9b73
-      size: 3539
+      md5: 5e611b13af634816fde9cea27f8d868c
+      size: 2688
     params:
       _variables.yml:
         barplot_kwargs:
@@ -111,7 +111,7 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: ece62fb1384cebcbfcf808651cb9d382
+      md5: 5fe711b3b414b3456581e3491202b2ed
       size: 43272
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
@@ -292,7 +292,7 @@ stages:
       md5: 7f39c66d0158a51342a5bd9edb3220b2
       size: 1604832
   render_pdf:
-    cmd: "quarto render content/manuscript.qmd --to iccr-pdf\n"
+    cmd: "quarto render\n"
     deps:
     - path: _extensions
       hash: md5
@@ -305,8 +305,8 @@ stages:
       size: 20035
     - path: figures
       hash: md5
-      md5: 9c8bcceb0994e15b4005e5426fd4373e.dir
-      size: 256505
+      md5: 307647901c38c24b8574eb2291a3dd0b.dir
+      size: 280202
       nfiles: 12
     - path: models
       hash: md5
@@ -333,10 +333,11 @@ stages:
           C10: 169
           total: 1242
     outs:
-    - path: _site/content/manuscript.pdf
+    - path: _site/
       hash: md5
-      md5: 767bc3b81e54ab71749da9e8a277de06
-      size: 178634
+      md5: 6961e58081c05a6c2a906d93dfec2e24.dir
+      size: 1594600
+      nfiles: 22
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
       models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml\n"
@@ -395,8 +396,8 @@ stages:
       size: 60425400
     - path: scripts/plot_cluster_assignments.py
       hash: md5
-      md5: 06aa88646cd12c0a78e4deadda66bd1c
-      size: 2364
+      md5: 0d7327277a6784ce179a07cef06c7a53
+      size: 3420
     params:
       _variables.yml:
         num_patients:
@@ -412,5 +413,5 @@ stages:
     outs:
     - path: figures/cluster_assignments.svg
       hash: md5
-      md5: 59322b28157d6058c8d7f95fd29e7543
-      size: 32233
+      md5: 77cd2a7a8aa8818ad777aeb0a4d5d489
+      size: 38042
