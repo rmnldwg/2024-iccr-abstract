@@ -189,9 +189,9 @@ In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is
 
 Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a binary random variable (RV) $X_v[t]$ taking on the true state of that level at the abstract time-step $t$ (0 for "healthy" and 1 for "involved"). Collected in a random vector $\mathbf{X}[t] = \left( X_1[t], X_2[t], \ldots, X_V[t] \right)$ they form the patient's state w.r.t. their lymphatic involvement at time $t$.
 
-We model the process of tumor progression via lymphatic drainage by connecting the RVs in a graph, as shown in @fig-graph-with-obs. The arcs in [this graph](#fig-graph-with-obs) represent conditional probabilities. The orange arcs correspond to observing a diagnosis $Y_v$, given the true state $X_v$. For the sake of brevity, we will not go into the details of describing how to infer the true -- but technically hidden -- state of LNL involvement from diagnoses with lower-than-one sensitivity and specificity. This description can be found in @zora231470. Throughout this work, we instead combine diagnostic and pathologic involvement information from the data into a "maximum likelihood" diagnosis and assume its sensitivity and specificity to be one, meaning the normally hidden state $X_v$ becomes the observed state. This simplification is reasonable for pathologic involvement and because we are at this stage more interested in testing whether our model is able to describe a realistic probability distribution over lymphatic involvement.
+We model the process of tumor progression via lymphatic drainage by connecting the RVs in a graph, as shown in @fig-schematic-and-graph. The arcs in [this graph](#fig-schematic-and-graph) represent conditional probabilities. The orange arcs correspond to observing a diagnosis $Y_v$, given the true state $X_v$. For the sake of brevity, we will not go into the details of describing how to infer the true -- but technically hidden -- state of LNL involvement from diagnoses with lower-than-one sensitivity and specificity. This description can be found in @zora231470. Throughout this work, we instead combine diagnostic and pathologic involvement information from the data into a "maximum likelihood" diagnosis and assume its sensitivity and specificity to be one, meaning the normally hidden state $X_v$ becomes the observed state. This simplification is reasonable for pathologic involvement and because we are at this stage more interested in testing whether our model is able to describe a realistic probability distribution over lymphatic involvement.
 
-The red arcs in the graph of @fig-graph-with-obs depict the probability that the primary tumor spreads within one abstract time-step. While the blue arcs symbolize the spread from an upstream LNL -- given it is already metastatic -- to a downstream level. For example, the edge from $X_2$ to $X_3$ encodes the probability $P\left( X_3[t+1] \mid X_2[t] \right)$, which is parametrized with $b_3$, and $t_{2 \rightarrow 3}$ and tabulated in @tbl-spread-2-to-3. There is an additional restriction on any LNL's state $X_v[t+1]=0$ to be healthy: It requires that the level was also healthy in the time-step before, meaning $X_v[t]=0$. This is because we assume no spontaneous self-healing of metastatic levels.
+The red arcs in the graph of @fig-schematic-and-graph depict the probability that the primary tumor spreads within one abstract time-step. While the blue arcs symbolize the spread from an upstream LNL -- given it is already metastatic -- to a downstream level. For example, the edge from $X_2$ to $X_3$ encodes the probability $P\left( X_3[t+1] \mid X_2[t] \right)$, which is parametrized with $b_3$, and $t_{2 \rightarrow 3}$ and tabulated in @tbl-spread-2-to-3. There is an additional restriction on any LNL's state $X_v[t+1]=0$ to be healthy: It requires that the level was also healthy in the time-step before, meaning $X_v[t]=0$. This is because we assume no spontaneous self-healing of metastatic levels.
 
 
 +--------------+------------+-----------------------------------------------------+
@@ -202,10 +202,10 @@ The red arcs in the graph of @fig-graph-with-obs depict the probability that the
 | $X_3[t+1]=1$ | $b_3$      | $1-b_3-t_{2 \rightarrow 3}+b_3 t_{2 \rightarrow 3}$ |
 +--------------+------------+-----------------------------------------------------+
 
-: Conditional probability $P\left( X_3[t+1] \mid X_2[t] \right)$ for a spread from LNL II to III during the transition from $t$ to $t+1$. This corresponds to one of the blue arcs in @fig-graph-with-obs. Note that the values in the row with $X_3[t+1]=0$ is all zeros, and the row with $X_3[t+1]=1$ all ones if $X_3[t]=1$. {#tbl-spread-2-to-3 tbl-colwidths="[25,18,40]"}
+: Conditional probability $P\left( X_3[t+1] \mid X_2[t] \right)$ for a spread from LNL II to III during the transition from $t$ to $t+1$. This corresponds to one of the blue arcs in @fig-schematic-and-graph. Note that the values in the row with $X_3[t+1]=0$ is all zeros, and the row with $X_3[t+1]=1$ all ones if $X_3[t]=1$. {#tbl-spread-2-to-3 tbl-colwidths="[25,18,40]"}
 
 
-With the introduced conditional probabilities, we can now compute the joint probability of any complete state $\mathbf{X}[t]=\boldsymbol{\xi}_i$ transitioning to any other possible state $\mathbf{X}[t+1]=\boldsymbol{\xi}_j$. Here, when we use $\boldsymbol{\xi}$ instead of $\mathbf{x}$ for the values the random vector $\mathbf{X}$ can take on, the $i$ and $j$ enumerate all $2^V$ combinations of the $V$ binary RVs. In the graph shown in @fig-graph-with-obs, this amounts to $2^V=8$ distinct $\boldsymbol{\xi}_i$. Because these terms are essentially products of terms like those in @tbl-spread-2-to-3. We can then collect these terms in a _transition matrix_ $\mathbf{A}$:
+With the introduced conditional probabilities, we can now compute the joint probability of any complete state $\mathbf{X}[t]=\boldsymbol{\xi}_i$ transitioning to any other possible state $\mathbf{X}[t+1]=\boldsymbol{\xi}_j$. Here, when we use $\boldsymbol{\xi}$ instead of $\mathbf{x}$ for the values the random vector $\mathbf{X}$ can take on, the $i$ and $j$ enumerate all $2^V$ combinations of the $V$ binary RVs. In the graph shown in @fig-schematic-and-graph, this amounts to $2^V=8$ distinct $\boldsymbol{\xi}_i$. Because these terms are essentially products of terms like those in @tbl-spread-2-to-3. We can then collect these terms in a _transition matrix_ $\mathbf{A}$:
 
 $$
 \mathbf{A} = \begin{pmatrix} A_{ij} \end{pmatrix} = P \left( \mathbf{X}[t+1] = \boldsymbol{\xi}_j \mid \mathbf{X}[t] = \boldsymbol{\xi}_i \right)
@@ -243,7 +243,7 @@ $$ {#eq-likelihood}
 
 Typically, one would compute the logarithm of this quantity for computational reasons. There is a wide array of available methods to obtain maximum likelihood estimates from this function or sample from the posterior over $\boldsymbol{\theta}$. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the `emcee` Python package [@foreman-mackey_emcee_2013].
 
-![Parametrized graph representation of the lymphatic network considering four LNLs. Blue, round nodes represent the hidden RVs, while orange square nodes show the observed RVs. Arcs represent a conditional probability parametrized with the quantity noted next to it.](../static/graph_with_obs.svg){#fig-graph-with-obs width="25%" fig-pos="th"}
+![On the left: Rough anatomical sketch of the tumor subsites and correspsonding ICD-10 codes that are present in the used data. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graph representation of the lymphatic network considering four LNLs. Blue nodes represent the hidden RVs, while the red one is the tumor. Arcs represent a conditional probability parametrized with the quantity noted next to it](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
 
 
 ## Mixture of HMMs {#sec-mixture-of-hmms}
@@ -256,7 +256,7 @@ $$
 P \left( \mathbf{D} \mid \boldsymbol{\Psi} \right) = \sum_{j=0}^g c_j P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)
 $$ {#eq-mixture-distribution}
 
-Here, the $\mathbf{c} \in [0,1]^g$ is the vector of mixing proportions with $\sum_{j=0}^g c_j = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g\right)$ is the vector of all $g$ models' parameters. Note that we will implement our model such that some of the parameters in each $\boldsymbol{\theta}_j$ are shared across the $g$ components -- namely the $t_{r \rightarrow v}$ corresponding to the blue arcs in @fig-graph-with-obs.
+Here, the $\mathbf{c} \in [0,1]^g$ is the vector of mixing proportions with $\sum_{j=0}^g c_j = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g\right)$ is the vector of all $g$ models' parameters.
 
 Let now $\mathfrak{D} = \left( \mathbf{D}_1, \ldots, \mathbf{D}_s \right)$ be a dataset consisting of $s$ subcohorts of patients. Within a subcohort $i$ we find $N_i$ patients with tumors in the same subsite. We can then introduce a _latent variable_ $\mathbf{Z}$ with a one-hot-encoding: Basically, it can take on values $\mathbf{z}_i \in \{ 0,1 \}^g$ with $z_{ij}=1$ if subcohort $i$ belongs to component $j$ and $z_{ij}=0$ else.
 
@@ -289,7 +289,7 @@ For the analyses in this work, we used five datasets from four different institu
 4. 239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in Fance
 5. 162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain
 
-![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b" width="49%"}
+![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b"}
 
 The data comes in the form of CSV tables and are -- except for the last and most recent addition -- publicly available [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.
 
@@ -300,7 +300,7 @@ In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in 
 
 Works super well, of course!
 
-![Assignment of each subsite to each of the two clusters. The fruther left a subsite, the more it is assigned to cluster A, the further right, the more to cluster B.](../figures/cluster_assignments.svg){#fig-cluster-assignments}
+![Assignment of each subsite to each of the two clusters. The fruther left a subsite, the more it is assigned to cluster A, the further right, the more to cluster B. The size of the marker (area) corresponds to the number of patients in the subsite.](../figures/cluster_assignments.svg){#fig-cluster-assignments}
 
 
 # Discussion {#sec-discussion}

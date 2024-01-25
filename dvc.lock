@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 5e611b13af634816fde9cea27f8d868c
-      size: 2688
+      md5: 5f8229064c97508ee023e9145d2672ff
+      size: 2765
     params:
       _variables.yml:
         barplot_kwargs:
@@ -101,18 +101,18 @@ stages:
           zorder: 2
         icd_code_map:
           C01: base of tongue
-          C02: other/unspec. pt. of tongue
+          C02: tongue, other
           C03: gum
           C04: floor of mouth
           C05: palate
-          C06: other/unspec. pt. of mouth
+          C06: mouth, other
           C09: tonsil
-          C10: oropharynx
+          C10: oropharynx, other
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: 5fe711b3b414b3456581e3491202b2ed
-      size: 43272
+      md5: 30400a92b1479c0a70e7e69d84a9e673
+      size: 46350
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
       _variables.yml\n"
@@ -125,13 +125,13 @@ stages:
       _variables.yml:
         icd_code_map:
           C01: base of tongue
-          C02: other/unspec. pt. of tongue
+          C02: tongue, other
           C03: gum
           C04: floor of mouth
           C05: palate
-          C06: other/unspec. pt. of mouth
+          C06: mouth, other
           C09: tonsil
-          C10: oropharynx
+          C10: oropharynx, other
   filter_oropharynx_and_oral_cavity:
     cmd: "lyscripts data filter data/joined.csv data/filtered.csv --include-subsites
       C01 C02 C03 C04 C05 C06 C09 C10\n"
@@ -301,13 +301,13 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: 0ea38b29b0bf5670660cd1b4ebba6a83
-      size: 20035
+      md5: 2db30d1fe7332672e6cb7e8d85ba371c
+      size: 19951
     - path: figures
       hash: md5
-      md5: 307647901c38c24b8574eb2291a3dd0b.dir
-      size: 280202
-      nfiles: 12
+      md5: 815e2ac1afc87edd2acf03f8b8b236a1.dir
+      size: 347149
+      nfiles: 13
     - path: models
       hash: md5
       md5: f8c46ba8972bcbfebe793cfba13bcb7b.dir
@@ -315,8 +315,8 @@ stages:
       nfiles: 4
     - path: static
       hash: md5
-      md5: 7f7cf86e0a573f41b69c4becfa4c1e19.dir
-      size: 208359
+      md5: 11085a2859d1dadc3c3bf5fe8c5345e5.dir
+      size: 354028
       nfiles: 2
     params:
       _variables.yml:
@@ -335,8 +335,8 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: 6961e58081c05a6c2a906d93dfec2e24.dir
-      size: 1594600
+      md5: f93bce928f4cf9dbb1382339056daf95.dir
+      size: 1848954
       nfiles: 22
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model

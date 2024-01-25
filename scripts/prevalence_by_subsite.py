@@ -34,7 +34,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to the output file.",
     )
     parser.add_argument(
-        "-p", "--params", type=Path, default="params.yaml",
+        "-p", "--params", type=Path, default="_variables.yml",
         help="Path to the parameter file. Looks for a key `barplot_kwargs`.",
     )
     return parser
@@ -49,6 +49,7 @@ def main():
             params = yaml.safe_load(f)
         barplot_kwargs.update(params.get("barplot_kwargs", {}))
         icd_code_map = params.get("icd_code_map", {})
+        icd_code_map = {k: f"{v} ({k})" for k, v in icd_code_map.items()}
 
     patient_data = load_patient_data(args.input)
     patient_data[SUBSITE] = patient_data[SUBSITE].apply(simplify_subsite)
