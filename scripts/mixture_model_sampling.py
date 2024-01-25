@@ -59,7 +59,6 @@ def main():
     num_subsites = len(patient_data[SIMPLE_SUBSITE].unique())
     lymph_model = create_model_from_config(params)
     lymph_model.modalities = {"max_llh": [1., 1.]}
-    lymph_model.diag_time_dists = {"all": lymph_model.diag_time_dists["early"]}
 
     mixture_model = LymphMixtureModel(
         lymph_model=lymph_model,

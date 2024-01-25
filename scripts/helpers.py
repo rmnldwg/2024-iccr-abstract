@@ -2,6 +2,7 @@
 Helper functions for the scripts.
 """
 from typing import Generator
+import argparse
 
 from lyscripts.plot.utils import COLORS as USZ
 from matplotlib.colors import to_rgba
@@ -33,3 +34,17 @@ def generate_location_colors(
             alphas.append(oral_cavity_alpha)
             oral_cavity_alpha -= delta_alpha
             yield to_rgba(USZ["blue"], oral_cavity_alpha)
+
+
+def str2bool(v: str) -> bool | None:
+    """Transform a string to a boolean or ``None``."""
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    elif v.lower() in ('none', 'null', ''):
+        return None
+    else:
+        raise argparse.ArgumentTypeError('Boolean or None value expected.')

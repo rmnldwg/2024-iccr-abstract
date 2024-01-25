@@ -5,14 +5,28 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "prevalence comparison",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--involvement", "none", "true", "none", "none",
+                "--subsite", "C01"
+            ]
+        },
+        {
             "name": "write num patients",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "--input", "data/enhanced.csv",
-                "--output", "_variables.yml"
+                "--input",
+                "data/enhanced.csv",
+                "--output",
+                "_variables.yml"
             ]
         }
     ]

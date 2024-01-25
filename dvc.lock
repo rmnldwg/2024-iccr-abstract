@@ -206,8 +206,7 @@ stages:
             use_mixing: true
           max_t: 10
           t_stages:
-          - early
-          - late
+          - all
         sampling:
           burnin: 1000
           kwargs:
@@ -221,16 +220,16 @@ stages:
     outs:
     - path: figures/sample_from_oropharynx/accept_rates.csv
       hash: md5
-      md5: b87183b99e9504e58bf5f900f41bd0e2
-      size: 929
+      md5: 9610d43ea98a29043f5b54fc12e1390f
+      size: 504
     - path: figures/sample_from_oropharynx/acor_times.csv
       hash: md5
-      md5: 64f4297aafe52518d12ce52df8b42119
-      size: 985
+      md5: 073b38c669c95603c9905129ebd022d0
+      size: 482
     - path: models/oropharynx.hdf5
       hash: md5
-      md5: de9cc1cf8d0e5d98113b88ff10862156
-      size: 1604832
+      md5: b5b17c24c6427735d181e387cd62443b
+      size: 1454016
   sample_from_oral_cavity:
     cmd: "lyscripts sample data/oral_cavity.csv models/oral_cavity.hdf5 --params _variables.yml
       --modalities max_llh --plots figures/sample_from_oral_cavity --pools 0 --seed
@@ -266,8 +265,7 @@ stages:
             use_mixing: true
           max_t: 10
           t_stages:
-          - early
-          - late
+          - all
         sampling:
           burnin: 1000
           kwargs:
@@ -281,16 +279,16 @@ stages:
     outs:
     - path: figures/sample_from_oral_cavity/accept_rates.csv
       hash: md5
-      md5: 74629fe00320df9ad3c83724b6fe824a
-      size: 1140
+      md5: 9610d43ea98a29043f5b54fc12e1390f
+      size: 504
     - path: figures/sample_from_oral_cavity/acor_times.csv
       hash: md5
-      md5: 8dfac64602f65e248eab56239998f963
-      size: 1214
+      md5: 073b38c669c95603c9905129ebd022d0
+      size: 482
     - path: models/oral_cavity.hdf5
       hash: md5
-      md5: 7f39c66d0158a51342a5bd9edb3220b2
-      size: 1604832
+      md5: b5b17c24c6427735d181e387cd62443b
+      size: 1454016
   render_pdf:
     cmd: "quarto render\n"
     deps:
@@ -301,23 +299,23 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: 2db30d1fe7332672e6cb7e8d85ba371c
-      size: 19951
+      md5: 236fb99fc44b8325d5ff5bbc14becce1
+      size: 19034
     - path: figures
       hash: md5
-      md5: 815e2ac1afc87edd2acf03f8b8b236a1.dir
-      size: 347149
-      nfiles: 13
+      md5: 7a0100a57029da3ce6a6a163e238f233.dir
+      size: 215327
+      nfiles: 11
     - path: models
       hash: md5
-      md5: f8c46ba8972bcbfebe793cfba13bcb7b.dir
-      size: 63635113
+      md5: e8e7fdd5dbb764ea9898f529f3aef46d.dir
+      size: 63333481
       nfiles: 4
     - path: static
       hash: md5
-      md5: 11085a2859d1dadc3c3bf5fe8c5345e5.dir
-      size: 354028
-      nfiles: 2
+      md5: 121ab34f0469b57010712594682141a0.dir
+      size: 252522
+      nfiles: 1
     params:
       _variables.yml:
         model.first_binom_prob: 0.3
@@ -335,8 +333,8 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: f93bce928f4cf9dbb1382339056daf95.dir
-      size: 1848954
+      md5: c7e500dca168005f24dfb735cdb690aa.dir
+      size: 1841940
       nfiles: 22
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
@@ -348,43 +346,43 @@ stages:
       size: 997595
     - path: scripts/mixture_model_sampling.py
       hash: md5
-      md5: 6937f39890225dc788097f3caa79b672
-      size: 3078
+      md5: 303cd47bf17592e4edade6e056687edc
+      size: 2998
     params:
       _variables.yml:
         mixture_model:
-          num_clusters: 2
           em_config:
-            max_steps: 20
-            method: INVERTED
-            verbose: false
-            e_step:
-              walkers_per_dim: 20
-              nsteps: 30
-              nburnin: 50
-              sampler: SIMPLE
-              show_progress: true
-            m_step:
-              minimize_method: SLSQP
             convergence:
               criterion: default
               default:
                 lookback_period: 4
                 threshold: 0.015
+            e_step:
+              nburnin: 50
+              nsteps: 30
+              sampler: SIMPLE
+              show_progress: true
+              walkers_per_dim: 20
+            m_step:
+              minimize_method: SLSQP
+            max_steps: 20
+            method: INVERTED
+            verbose: false
           mcmc_config:
             sampler: SIMPLE
             sampling_params:
-              walkers_per_dim: 20
-              nsteps: 1000
               nburnin: 600
+              nsteps: 1000
+              walkers_per_dim: 20
+          num_clusters: 2
     outs:
     - path: figures/mixture_history.svg
       hash: md5
-      md5: 973c2b33ffb268e3fabfc81381e191f8
-      size: 74683
+      md5: 7e6180bc8482164e9114dc6341cedc2c
+      size: 69287
     - path: models/mixture.hdf5
       hash: md5
-      md5: fd10922578516d307695d2d20eaca3c2
+      md5: 2aeb04cd4e3694d8e6fc2364f6ce160a
       size: 60425400
   plot_cluster_assignments:
     cmd: "python scripts/plot_cluster_assignments.py --model models/mixture.hdf5 --output
@@ -392,7 +390,7 @@ stages:
     deps:
     - path: models/mixture.hdf5
       hash: md5
-      md5: fd10922578516d307695d2d20eaca3c2
+      md5: 2aeb04cd4e3694d8e6fc2364f6ce160a
       size: 60425400
     - path: scripts/plot_cluster_assignments.py
       hash: md5
@@ -413,5 +411,5 @@ stages:
     outs:
     - path: figures/cluster_assignments.svg
       hash: md5
-      md5: 77cd2a7a8aa8818ad777aeb0a4d5d489
-      size: 38042
+      md5: a55c1c66b19644fe2f2418a4ed470d84
+      size: 38099

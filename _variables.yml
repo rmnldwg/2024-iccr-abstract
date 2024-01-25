@@ -84,8 +84,7 @@ model:
     use_mixing: true
   max_t: 10
   t_stages:
-  - early
-  - late
+  - all
 num_patients:
   C01: 212
   C02: 158
