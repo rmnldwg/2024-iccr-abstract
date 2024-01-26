@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.537">
+<meta name="generator" content="quarto-1.4.539">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -25,7 +25,7 @@
 <meta name="author" content="Roland Giger">
 <meta name="author" content="Jan Unkelbach">
 
-<title>A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer</title>
+<title>A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer depending on primary tumor location</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -185,7 +185,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer depending on primary tumor location</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -379,7 +379,7 @@ window.Quarto = {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    <p>We previously developed a mechanistic hidden Markov model (HMM) to predict the lymphatic tumor progression in oropharyngeal squamous cell carcinomas (OPSCCs). To extend the model to other tumor subsites, defined by ICD-10 codes, in the head and neck, we employ a mixture of these HMMs and learn the cluster assignments and model parameters in an iterative, EM-like algorithm from multi-centric data. The mixture model manages to cluster anatomically close subsites and correctly infers the clusters’ parameters. Using this mixture model allows the prediction of individual risks of occult nodal disease, given a diagnosis that includes tumor subsite.</p>
+    <p>We previously developed a mechanistic hidden Markov model (HMM) to predict the lymphatic tumor progression in oropharyngeal squamous cell carcinomas (OPSCCs). To extend the model to other tumor subsites, defined by ICD-10 codes, in the head and neck, we employ a mixture of these HMMs and learn the cluster assignments and model parameters in an iterative, EM-like algorithm from multi-centric data. The mixture model manages to group anatomically close subsites and correctly infers the clusters’ parameters. Using this mixture model allows the prediction of individual risks of occult nodal disease, given a diagnosis that includes tumor subsite.</p>
   </div>
 </div>
 
@@ -447,36 +447,16 @@ Figure&nbsp;1: On the left: Rough anatomical sketch of the tumor subsites and co
 <p><span id="eq-mixture-distribution"><span class="math display">\[
 P \left( \mathbf{D} \mid \boldsymbol{\theta}, \boldsymbol{\pi}\right) = \prod_s \prod_i \left[ \sum_{m=1}^M \pi_{sm} P_m \left( \mathbf{X}=\boldsymbol{\xi}_i \mid \boldsymbol{\theta}_m \right) \right]^{N_{is}}
 \tag{6}\]</span></span></p>
-<p>We now have two types of parameters, the probabilities of tutor spread for the different models <span class="math inline">\(\boldsymbol{\theta_m}\)</span>, and the mixing coefficients <span class="math inline">\(\pi_{sm}\)</span>. Assuming a uniform prior in the interval <span class="math inline">\([0,1]\)</span> for all parameters, the posterior distribution over the parameters <span class="math inline">\(P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)\)</span> is given by the likelihood <a href="#eq-mixture-distribution" class="quarto-xref">equation&nbsp;7</a> except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the <code>emcee</code> Python package <span class="citation" data-cites="foreman-mackey_emcee_2013">(<a href="#ref-foreman-mackey_emcee_2013" role="doc-biblioref">Foreman-Mackey et al. 2013</a>)</span> to sample model parameters from the posterior distribution. However, <span class="math inline">\(P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)\)</span> itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an <em>expectation-maximization (EM)</em> algorithm where we iteratively sample model parameters <span class="math inline">\(\boldsymbol{\theta_m}\)</span> using MCMC and then determine the most likely mixing coefficients.</p>
-<p>…</p>
-<p>The just introduced model is capable of learning one set of or distribution over parameters <span class="math inline">\(\boldsymbol{\theta}\)</span> from a cohort of patients with a primary tumor in a given subsite. If we tried to train it with a cohort consisting of patients with tumors in two very different subsites, the model would likely learn parameters that represent a compromise between the two subcohort’s true parameters. This compromise might describe neither of the subcohorts’ lymphatic spread patterns sufficiently well.</p>
-<p>In such cases, mixture models are often considered. They assume the data to come from a finite mixture distribution, which – in our particular case – can be written as follows:</p>
-<p><span id="eq-mixture-distribution"><span class="math display">\[
-P \left( \mathbf{D} \mid \boldsymbol{\Psi} \right) = \sum_{j=0}^g c_j P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)
-\tag{7}\]</span></span></p>
-<p>Here, the <span class="math inline">\(\mathbf{c} \in [0,1]^g\)</span> is the vector of mixing proportions with <span class="math inline">\(\sum_{j=0}^g c_j = 1\)</span>, while the <span class="math inline">\(\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g\right)\)</span> is the vector of all <span class="math inline">\(g\)</span> models’ parameters. Note that we will implement our model such that some of the parameters in each <span class="math inline">\(\boldsymbol{\theta}_j\)</span> are shared across the <span class="math inline">\(g\)</span> components – namely the <span class="math inline">\(t_{r \rightarrow v}\)</span> corresponding to the blue arcs in <a href="#fig-schematic-and-graph" class="quarto-xref">figure&nbsp;1</a>.</p>
-<p>Let now <span class="math inline">\(\mathfrak{D} = \left( \mathbf{D}_1, \ldots, \mathbf{D}_s \right)\)</span> be a dataset consisting of <span class="math inline">\(s\)</span> subcohorts of patients. Within a subcohort <span class="math inline">\(i\)</span> we find <span class="math inline">\(N_i\)</span> patients with tumors in the same subsite. We can then introduce a <em>latent variable</em> <span class="math inline">\(\mathbf{Z}\)</span> with a one-hot-encoding: Basically, it can take on values <span class="math inline">\(\mathbf{z}_i \in \{ 0,1 \}^g\)</span> with <span class="math inline">\(z_{ij}=1\)</span> if subcohort <span class="math inline">\(i\)</span> belongs to component <span class="math inline">\(j\)</span> and <span class="math inline">\(z_{ij}=0\)</span> else.</p>
-<p>The latent variables are helpful in resolving the invariance of the likelihood w.r.t. permutations of the component labels, which may introduce problems, e.g.&nbsp;for common MCMC sampling methods. The <span class="math inline">\(\mathbf{Z}\)</span> allows us to derive two sets of interdependent equations that we may solve in an iterative fashion (see e.g. <span class="citation" data-cites="bishop_pattern_2006">Bishop (<a href="#ref-bishop_pattern_2006" role="doc-biblioref">2006</a>)</span> for a detailed derivation) that is commonly referred to as <em>expectation-maximization (EM)</em> algorithm:</p>
-<p>The first set are the probabilities of subcohort <span class="math inline">\(i\)</span> to belong to component <span class="math inline">\(j\)</span>, given a set of parameters <span class="math inline">\(\boldsymbol{\Psi}^\star\)</span>. These are often called the <em>responsibilities</em>: <span class="math display">\[
-\gamma (z_{ij}) = P \left( z_{ij}=1 \mid \mathbf{D}_i , \boldsymbol{\Psi}^\star, \mathbf{c} \right) = \frac{ c_j P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_j^\star \right) }{\sum_{k=0}^g c_k P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_k^\star \right)}
-\]</span></p>
-<p>From this, we can compute new mixing proportions <span class="math inline">\(c_j^\star=\sum_{i=1}^s \gamma (z_{ij}) / s\)</span> and then infer new parameters <span class="math inline">\(\boldsymbol{\Psi}^\star\)</span> – e.g.&nbsp;via MCMC sampling – from the resulting likelihood, which is the second set:</p>
-<p><span class="math display">\[
-P \left( \mathbf{D} \mid \boldsymbol{\Psi}, \mathbf{c}^\star \right) = \sum_{j=0}^g c_j^\star P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)
-\]</span></p>
-</section>
-<section id="sec-implementation" class="level2">
-<h2 class="anchored" data-anchor-id="sec-implementation">Implementation</h2>
-<p>We did this in this and that fashion…</p>
+<p>We now have two types of parameters, the probabilities of tumor spread for the different models <span class="math inline">\(\boldsymbol{\theta_m}\)</span>, and the mixing coefficients <span class="math inline">\(\pi_{sm}\)</span>. Assuming a uniform prior in the interval <span class="math inline">\([0,1]\)</span> for all parameters, the posterior distribution over the parameters <span class="math inline">\(P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)\)</span> is given by the likelihood <a href="#eq-mixture-distribution" class="quarto-xref">equation&nbsp;6</a> except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the <code>emcee</code> Python package <span class="citation" data-cites="foreman-mackey_emcee_2013">(<a href="#ref-foreman-mackey_emcee_2013" role="doc-biblioref">Foreman-Mackey et al. 2013</a>)</span> to sample model parameters from the posterior distribution. However, <span class="math inline">\(P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)\)</span> itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an <em>expectation-maximization (EM)</em> algorithm where we iteratively sample model parameters <span class="math inline">\(\boldsymbol{\theta_m}\)</span> using MCMC and then determine the most likely mixing coefficients.</p>
 </section>
 <section id="multi-centric-data" class="level2">
 <h2 class="anchored" data-anchor-id="multi-centric-data">Multi-Centric Data</h2>
 <p>For the analyses in this work, we used five datasets from four different institutions:</p>
 <ol type="1">
-<li>287 oropharyngeal patients from the University of Zurich in Swizerland</li>
-<li>263 oropharyngeal patients from the Centre Léon Bérard in Fance</li>
-<li>289 oropharyngeal and oral cavity patients from the Inselspital Bern in Swizerland</li>
-<li>239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in Fance</li>
+<li>287 oropharyngeal patients from the University of Zurich in Switzerland</li>
+<li>263 oropharyngeal patients from the Centre Léon Bérard in France</li>
+<li>289 oropharyngeal and oral cavity patients from the Inselspital Bern in Switzerland</li>
+<li>239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in France</li>
 <li>162 oropharyngeal patients from the Hospital Vall d’Hebron in Spain</li>
 </ol>
 <div id="fig-prevalence-by-subsite" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-pos="b">
@@ -485,31 +465,41 @@ P \left( \mathbf{D} \mid \boldsymbol{\Psi}, \mathbf{c}^\star \right) = \sum_{j=0
 <img src="../figures/prevalence_by_subsite.svg" class="img-fluid figure-img" data-fig-pos="b">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-prevalence-by-subsite-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.
+Figure&nbsp;2: Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shades of blue, oropharynx subsites in shades of orange.
 </figcaption>
 </figure>
 </div>
-<p>The data comes in the form of CSV tables and are – except for the last and most recent addition – publicly available <span class="citation" data-cites="ludwig_detailed_2022 ludwig_multi-centric_2023">(<a href="#ref-ludwig_detailed_2022" role="doc-biblioref">Ludwig, Hoffmann, Pouymayou, Däppen, et al. 2022</a>; <a href="#ref-ludwig_multi-centric_2023" role="doc-biblioref">Ludwig et al. 2023</a>)</span> and may be interactively explored in our <strong>Ly</strong>mphatic <strong>Pro</strong>gression e<strong>X</strong>plorer <a href="https://lyprox.org">LyProX</a>. Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.</p>
-<p>In <a href="#fig-prevalence-by-subsite" class="quarto-xref">figure&nbsp;2</a>, we have plotted the prevalence of involvement in the four LNLs I, II, III, and IV stratified by the primary tumor’s subsite. We only included patients with tumors in the gum, floor of mouth, other/unspecified parts of the mouth, palate, oropharynx, tosil, base of tongue, and other/unspecified parts of tongue, resulting in 1242 patients.</p>
+<p>The data sets 1-4 are publicly available in the form of CSV tables <span class="citation" data-cites="ludwig_detailed_2022 ludwig_multi-centric_2023">(<a href="#ref-ludwig_detailed_2022" role="doc-biblioref">Ludwig, Hoffmann, Pouymayou, Däppen, et al. 2022</a>; <a href="#ref-ludwig_multi-centric_2023" role="doc-biblioref">Ludwig et al. 2023</a>)</span> and may be interactively explored in our <strong>Ly</strong>mphatic <strong>Pro</strong>gression e<strong>X</strong>plorer <a href="https://lyprox.org">LyProX</a>. Data set 5 is not yet public but of similar format. For each patient, the primary tumor subsite is reported (among other patient and tumor characteristics) and each individual LNL is reported as metastatic or healthy, according to the available diagnostic modalities (in part pathology after neck dissection, otherwise clinical involvement).</p>
+<p>In <a href="#fig-prevalence-by-subsite" class="quarto-xref">figure&nbsp;2</a>, we have plotted the prevalence of involvement in the four ipsilateral LNLs I, II, III, and IV stratified by the primary tumor’s subsite. We included patients with tumors in the oral cavity, gum (C03), floor of mouth (C04), other/unspecified parts of the mouth (C06), other/unspecified parts of tongue (C02), palate (C05), and tumors in the oropharynx (C10), tonsil (C09), base of tongue (C01), resulting in 1242 patients. The figure illustrates the variations in LNL involvement between subsites within the oral cavity and oropharynx categories.</p>
 </section>
 </section>
 <section id="sec-results" class="level1">
 <h1>Results</h1>
-<p>Works super well, of course!</p>
 <div id="fig-cluster-assignments" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-cluster-assignments-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="../figures/cluster_assignments.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cluster-assignments-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Assignment of each subsite to each of the two clusters. The fruther left a subsite, the more it is assigned to cluster A, the further right, the more to cluster B. The size of the marker (area) corresponds to the number of patients in the subsite.
+Figure&nbsp;3: Assignment of each subsite to each of the two components. The further left a subsite, the more it is assigned to component A, the further right, the more to component B. The size of the marker (area) corresponds to the number of patients in the subsite.
+</figcaption>
+</figure>
+</div>
+<p>We demonstrate the methodology for a mixture model with <span class="math inline">\(M=2\)</span> components, considering the ipsilateral involvement of LNLs I, II, III, and IV and the primary tumor subsites shown in <a href="#fig-prevalence-by-subsite" class="quarto-xref">figure&nbsp;2</a>. In <a href="#fig-cluster-assignments" class="quarto-xref">figure&nbsp;3</a> we show the resulting mixture coefficients <span class="math inline">\(\pi_{sm}\)</span>. The interpretation of this result is as follows: Tumors of the base of tongue (C01) are fully described by component A, and tumors of the gum (C03) are fully described by component B. These two subsites are the most distinct regarding the involvement of LNLs I and II, and the result is thus intuitive. Component A may be interpreted as a model for oropharynx-like tumor spread, and component B as a model for oral cavity-like tumor spread. All other subsites are described as mixtures. Tumors in the tonsil (C09) have LNL involvement similar to base of tongue tumors and are mostly assigned to component A. Instead, tumors of the palate (C05) are to similar degree assigned to components A and B, which is consistent with the anatomical location and the observation that the LNL involvement is in between oropharynx and oral cavity-type patterns.</p>
+<div id="fig-prevalence-comparison" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-env="figure*">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-prevalence-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../figures/prevalence_comparison.svg" class="img-fluid figure-img" data-fig-env="figure*">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-prevalence-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The prevalence of involvement as seen in the data (vertical dashed lines), predicted by an independent model for the oropharyngeal or oral cavity patients (outlined histograms), and predicted by the mixture model (filled histograms). Each row correpsonds to one subsite and each column to the predicted or observed prevalence in one LNL.
 </figcaption>
 </figure>
 </div>
 </section>
 <section id="sec-discussion" class="level1">
 <h1>Discussion</h1>
-<p>All that’s left is for other people to bring this into clinical practice.</p>
+<p>We have previously developed a model of lymphatic progression of HNSCC using HMM, which allows us to estimate the probability of occult lymph node metastases in clinically negative LNLs. Mixture models are a suitable method to incorporate the primary tumor location into the model, which allows us to account for differences in lymph node involvement for different subsites. Future work will extend the work to tumors in the hypopharynx and larynx and optimize the number of model components.</p>
 
 
 <!-- -->
@@ -523,9 +513,6 @@ Batth, S S, J J Caudell, and A M Chen. 2014. <span>“Practical Considerations i
 </div>
 <div id="ref-biau_selection_2019" class="csl-entry" role="listitem">
 Biau, Julian, Michel Lapeyre, Idriss Troussier, Wilfried Budach, Jordi Giralt, Cai Grau, Joanna Kazmierska, et al. 2019. <span>“Selection of Lymph Node Target Volumes for Definitive Head and Neck Radiation Therapy: A 2019 <span>Update</span>.”</span> <em>Radiotherapy and Oncology</em> 134 (May): 1–9. <a href="https://doi.org/10.1016/j.radonc.2019.01.018">https://doi.org/10.1016/j.radonc.2019.01.018</a>.
-</div>
-<div id="ref-bishop_pattern_2006" class="csl-entry" role="listitem">
-Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning</em>. Information Science and Statistics. <span>New York</span>: <span>Springer</span>.
 </div>
 <div id="ref-foreman-mackey_emcee_2013" class="csl-entry" role="listitem">
 Foreman-Mackey, Daniel, David W. Hogg, Dustin Lang, and Jonathan Goodman. 2013. <span>“Emcee: <span>The MCMC Hammer</span>.”</span> <em><span>\</span>Pasp</em> 125 (925): 306. <a href="https://doi.org/10.1086/670067">https://doi.org/10.1086/670067</a>.
@@ -992,7 +979,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
 <div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="an">title:</span><span class="co"> A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="an">title:</span><span class="co"> A mixture of hidden Markov models to predict the lymphatic spread in head and neck cancer depending on primary tumor location</span></span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="an">author:</span></span>
 <span id="cb1-4"><a href="#cb1-4"></a><span class="co">  - name: Roman Ludwig</span></span>
 <span id="cb1-5"><a href="#cb1-5"></a><span class="co">    orcid: 0000-0001-9434-328X</span></span>
@@ -1132,7 +1119,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-139"><a href="#cb1-139"></a><span class="co">  extend the model to other tumor subsites, defined by ICD-10 codes, in the head and</span></span>
 <span id="cb1-140"><a href="#cb1-140"></a><span class="co">  neck, we employ a mixture of these HMMs and learn the cluster assignments and model</span></span>
 <span id="cb1-141"><a href="#cb1-141"></a><span class="co">  parameters in an iterative, EM-like algorithm from multi-centric data. The mixture</span></span>
-<span id="cb1-142"><a href="#cb1-142"></a><span class="co">  model manages to cluster anatomically close subsites and correctly infers the</span></span>
+<span id="cb1-142"><a href="#cb1-142"></a><span class="co">  model manages to group anatomically close subsites and correctly infers the</span></span>
 <span id="cb1-143"><a href="#cb1-143"></a><span class="co">  clusters' parameters. Using this mixture model allows the prediction of individual</span></span>
 <span id="cb1-144"><a href="#cb1-144"></a><span class="co">  risks of occult nodal disease, given a diagnosis that includes tumor subsite.</span></span>
 <span id="cb1-145"><a href="#cb1-145"></a><span class="an">format:</span></span>
@@ -1225,69 +1212,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-232"><a href="#cb1-232"></a>P \left( \mathbf{D} \mid \boldsymbol{\theta}, \boldsymbol{\pi}\right) = \prod_s \prod_i \left<span class="co">[</span><span class="ot"> \sum_{m=1}^M \pi_{sm} P_m \left( \mathbf{X}=\boldsymbol{\xi}_i \mid \boldsymbol{\theta}_m \right) \right</span><span class="co">]</span>^{N_{is}}</span>
 <span id="cb1-233"><a href="#cb1-233"></a>$$ {#eq-mixture-distribution}</span>
 <span id="cb1-234"><a href="#cb1-234"></a></span>
-<span id="cb1-235"><a href="#cb1-235"></a>We now have two types of parameters, the probabilities of tutor spread for the different models $\boldsymbol{\theta_m}$, and the mixing coefficients $\pi_{sm}$. Assuming a uniform prior in the interval $<span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$ for all parameters, the posterior distribution over the parameters $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ is given by the likelihood @eq-mixture-distribution except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the <span class="in">`emcee`</span> Python package <span class="co">[</span><span class="ot">@foreman-mackey_emcee_2013</span><span class="co">]</span> to sample model parameters from the posterior distribution. However, $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an _expectation-maximization (EM)_ algorithm where we iteratively sample model parameters $\boldsymbol{\theta_m}$ using MCMC and then determine the most likely mixing coefficients.</span>
+<span id="cb1-235"><a href="#cb1-235"></a>We now have two types of parameters, the probabilities of tumor spread for the different models $\boldsymbol{\theta_m}$, and the mixing coefficients $\pi_{sm}$. Assuming a uniform prior in the interval $<span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$ for all parameters, the posterior distribution over the parameters $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ is given by the likelihood @eq-mixture-distribution except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the <span class="in">`emcee`</span> Python package <span class="co">[</span><span class="ot">@foreman-mackey_emcee_2013</span><span class="co">]</span> to sample model parameters from the posterior distribution. However, $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an _expectation-maximization (EM)_ algorithm where we iteratively sample model parameters $\boldsymbol{\theta_m}$ using MCMC and then determine the most likely mixing coefficients.</span>
 <span id="cb1-236"><a href="#cb1-236"></a></span>
-<span id="cb1-237"><a href="#cb1-237"></a>...</span>
-<span id="cb1-238"><a href="#cb1-238"></a></span>
+<span id="cb1-237"><a href="#cb1-237"></a></span>
+<span id="cb1-238"><a href="#cb1-238"></a><span class="fu">## Multi-Centric Data</span></span>
 <span id="cb1-239"><a href="#cb1-239"></a></span>
-<span id="cb1-240"><a href="#cb1-240"></a>The just introduced model is capable of learning one set of or distribution over parameters $\boldsymbol{\theta}$ from a cohort of patients with a primary tumor in a given subsite. If we tried to train it with a cohort consisting of patients with tumors in two very different subsites, the model would likely learn parameters that represent a compromise between the two subcohort's true parameters. This compromise might describe neither of the subcohorts' lymphatic spread patterns sufficiently well.</span>
+<span id="cb1-240"><a href="#cb1-240"></a>For the analyses in this work, we used five datasets from four different institutions:</span>
 <span id="cb1-241"><a href="#cb1-241"></a></span>
-<span id="cb1-242"><a href="#cb1-242"></a>In such cases, mixture models are often considered. They assume the data to come from a finite mixture distribution, which -- in our particular case -- can be written as follows:</span>
-<span id="cb1-243"><a href="#cb1-243"></a></span>
-<span id="cb1-244"><a href="#cb1-244"></a>$$</span>
-<span id="cb1-245"><a href="#cb1-245"></a>P \left( \mathbf{D} \mid \boldsymbol{\Psi} \right) = \sum_{j=0}^g c_j P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)</span>
-<span id="cb1-246"><a href="#cb1-246"></a>$$ {#eq-mixture-distribution}</span>
+<span id="cb1-242"><a href="#cb1-242"></a><span class="ss">1. </span>287 oropharyngeal patients from the University of Zurich in Switzerland</span>
+<span id="cb1-243"><a href="#cb1-243"></a><span class="ss">2. </span>263 oropharyngeal patients from the Centre Léon Bérard in France</span>
+<span id="cb1-244"><a href="#cb1-244"></a><span class="ss">3. </span>289 oropharyngeal and oral cavity patients from the Inselspital Bern in Switzerland</span>
+<span id="cb1-245"><a href="#cb1-245"></a><span class="ss">4. </span>239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in France</span>
+<span id="cb1-246"><a href="#cb1-246"></a><span class="ss">5. </span>162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain</span>
 <span id="cb1-247"><a href="#cb1-247"></a></span>
-<span id="cb1-248"><a href="#cb1-248"></a>Here, the $\mathbf{c} \in <span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>^g$ is the vector of mixing proportions with $\sum_{j=0}^g c_j = 1$, while the $\boldsymbol{\Psi} = \left( \boldsymbol{\theta}_1, \ldots, \boldsymbol{\theta}_g\right)$ is the vector of all $g$ models' parameters. Note that we will implement our model such that some of the parameters in each $\boldsymbol{\theta}_j$ are shared across the $g$ components -- namely the $t_{r \rightarrow v}$ corresponding to the blue arcs in @fig-schematic-and-graph.</span>
+<span id="cb1-248"><a href="#cb1-248"></a><span class="al">![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shades of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg)</span>{#fig-prevalence-by-subsite fig-pos="b"}</span>
 <span id="cb1-249"><a href="#cb1-249"></a></span>
-<span id="cb1-250"><a href="#cb1-250"></a>Let now $\mathfrak{D} = \left( \mathbf{D}_1, \ldots, \mathbf{D}_s \right)$ be a dataset consisting of $s$ subcohorts of patients. Within a subcohort $i$ we find $N_i$ patients with tumors in the same subsite. We can then introduce a _latent variable_ $\mathbf{Z}$ with a one-hot-encoding: Basically, it can take on values $\mathbf{z}_i \in \{ 0,1 \}^g$ with $z_{ij}=1$ if subcohort $i$ belongs to component $j$ and $z_{ij}=0$ else.</span>
+<span id="cb1-250"><a href="#cb1-250"></a>The data sets 1-4 are publicly available in the form of CSV tables <span class="co">[</span><span class="ot">@ludwig_detailed_2022;@ludwig_multi-centric_2023</span><span class="co">]</span> and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer <span class="co">[</span><span class="ot">LyProX</span><span class="co">](https://lyprox.org)</span>. Data set 5 is not yet public but of similar format. For each patient, the primary tumor subsite is reported (among other patient and tumor characteristics) and each individual LNL is reported as metastatic or healthy, according to the available diagnostic modalities (in part pathology after neck dissection, otherwise clinical involvement).</span>
 <span id="cb1-251"><a href="#cb1-251"></a></span>
-<span id="cb1-252"><a href="#cb1-252"></a>The latent variables are helpful in resolving the invariance of the likelihood w.r.t. permutations of the component labels, which may introduce problems, e.g. for common MCMC sampling methods. The $\mathbf{Z}$ allows us to derive two sets of interdependent equations that we may solve in an iterative fashion (see e.g. @bishop_pattern_2006 for a detailed derivation) that is commonly referred to as _expectation-maximization (EM)_ algorithm:</span>
+<span id="cb1-252"><a href="#cb1-252"></a>In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four ipsilateral LNLs I, II, III, and IV stratified by the primary tumor's subsite. We included patients with tumors in the oral cavity, gum (C03), floor of mouth (C04), other/unspecified parts of the mouth (C06), other/unspecified parts of tongue (C02), palate (C05), and tumors in the oropharynx (C10), tonsil (C09), base of tongue (C01), resulting in {{&lt; var num_patients.total &gt;}} patients. The figure illustrates the variations in LNL involvement between subsites within the oral cavity and oropharynx categories.</span>
 <span id="cb1-253"><a href="#cb1-253"></a></span>
-<span id="cb1-254"><a href="#cb1-254"></a>The first set are the probabilities of subcohort $i$ to belong to component $j$, given a set of parameters $\boldsymbol{\Psi}^\star$. These are often called the _responsibilities_:</span>
-<span id="cb1-255"><a href="#cb1-255"></a>$$</span>
-<span id="cb1-256"><a href="#cb1-256"></a>\gamma (z_{ij}) = P \left( z_{ij}=1 \mid \mathbf{D}_i , \boldsymbol{\Psi}^\star, \mathbf{c} \right) = \frac{ c_j P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_j^\star \right) }{\sum_{k=0}^g c_k P \left( \mathbf{D}_i \mid \boldsymbol{\theta}_k^\star \right)}</span>
-<span id="cb1-257"><a href="#cb1-257"></a>$$</span>
+<span id="cb1-254"><a href="#cb1-254"></a></span>
+<span id="cb1-255"><a href="#cb1-255"></a><span class="fu"># Results {#sec-results}</span></span>
+<span id="cb1-256"><a href="#cb1-256"></a></span>
+<span id="cb1-257"><a href="#cb1-257"></a><span class="al">![Assignment of each subsite to each of the two components. The further left a subsite, the more it is assigned to component A, the further right, the more to component B. The size of the marker (area) corresponds to the number of patients in the subsite.](../figures/cluster_assignments.svg)</span>{#fig-cluster-assignments}</span>
 <span id="cb1-258"><a href="#cb1-258"></a></span>
-<span id="cb1-259"><a href="#cb1-259"></a>From this, we can compute new mixing proportions $c_j^\star=\sum_{i=1}^s \gamma (z_{ij}) / s$ and then infer new parameters $\boldsymbol{\Psi}^\star$ -- e.g. via MCMC sampling -- from the resulting likelihood, which is the second set:</span>
+<span id="cb1-259"><a href="#cb1-259"></a>We demonstrate the methodology for a mixture model with $M=2$ components, considering the ipsilateral involvement of LNLs I, II, III, and IV and the primary tumor subsites shown in @fig-prevalence-by-subsite. In @fig-cluster-assignments we show the resulting mixture coefficients $\pi_{sm}$. The interpretation of this result is as follows: Tumors of the base of tongue (C01) are fully described by component A, and tumors of the gum (C03) are fully described by component B. These two subsites are the most distinct regarding the involvement of LNLs I and II, and the result is thus intuitive. Component A may be interpreted as a model for oropharynx-like tumor spread, and component B as a model for oral cavity-like tumor spread. All other subsites are described as mixtures. Tumors in the tonsil (C09) have LNL involvement similar to base of tongue tumors and are mostly assigned to component A. Instead, tumors of the palate (C05) are to similar degree assigned to components A and B, which is consistent with the anatomical location and the observation that the LNL involvement is in between oropharynx and oral cavity-type patterns.</span>
 <span id="cb1-260"><a href="#cb1-260"></a></span>
-<span id="cb1-261"><a href="#cb1-261"></a>$$</span>
-<span id="cb1-262"><a href="#cb1-262"></a>P \left( \mathbf{D} \mid \boldsymbol{\Psi}, \mathbf{c}^\star \right) = \sum_{j=0}^g c_j^\star P \left( \mathbf{D} \mid \boldsymbol{\theta}_j \right)</span>
-<span id="cb1-263"><a href="#cb1-263"></a>$$</span>
+<span id="cb1-261"><a href="#cb1-261"></a><span class="al">![The prevalence of involvement as seen in the data (vertical dashed lines), predicted by an independent model for the oropharyngeal or oral cavity patients (outlined histograms), and predicted by the mixture model (filled histograms). Each row correpsonds to one subsite and each column to the predicted or observed prevalence in one LNL.](../figures/prevalence_comparison.svg)</span>{#fig-prevalence-comparison fig-env="figure*"}</span>
+<span id="cb1-262"><a href="#cb1-262"></a></span>
+<span id="cb1-263"><a href="#cb1-263"></a><span class="fu"># Discussion {#sec-discussion}</span></span>
 <span id="cb1-264"><a href="#cb1-264"></a></span>
-<span id="cb1-265"><a href="#cb1-265"></a></span>
-<span id="cb1-266"><a href="#cb1-266"></a><span class="fu">## Implementation {#sec-implementation}</span></span>
-<span id="cb1-267"><a href="#cb1-267"></a></span>
-<span id="cb1-268"><a href="#cb1-268"></a>We did this in this and that fashion...</span>
-<span id="cb1-269"><a href="#cb1-269"></a></span>
-<span id="cb1-270"><a href="#cb1-270"></a></span>
-<span id="cb1-271"><a href="#cb1-271"></a><span class="fu">## Multi-Centric Data</span></span>
-<span id="cb1-272"><a href="#cb1-272"></a></span>
-<span id="cb1-273"><a href="#cb1-273"></a>For the analyses in this work, we used five datasets from four different institutions:</span>
-<span id="cb1-274"><a href="#cb1-274"></a></span>
-<span id="cb1-275"><a href="#cb1-275"></a><span class="ss">1. </span>287 oropharyngeal patients from the University of Zurich in Swizerland</span>
-<span id="cb1-276"><a href="#cb1-276"></a><span class="ss">2. </span>263 oropharyngeal patients from the Centre Léon Bérard in Fance</span>
-<span id="cb1-277"><a href="#cb1-277"></a><span class="ss">3. </span>289 oropharyngeal and oral cavity patients from the Inselspital Bern in Swizerland</span>
-<span id="cb1-278"><a href="#cb1-278"></a><span class="ss">4. </span>239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in Fance</span>
-<span id="cb1-279"><a href="#cb1-279"></a><span class="ss">5. </span>162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain</span>
-<span id="cb1-280"><a href="#cb1-280"></a></span>
-<span id="cb1-281"><a href="#cb1-281"></a><span class="al">![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shaed of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg)</span>{#fig-prevalence-by-subsite fig-pos="b"}</span>
-<span id="cb1-282"><a href="#cb1-282"></a></span>
-<span id="cb1-283"><a href="#cb1-283"></a>The data comes in the form of CSV tables and are -- except for the last and most recent addition -- publicly available <span class="co">[</span><span class="ot">@ludwig_detailed_2022;@ludwig_multi-centric_2023</span><span class="co">]</span> and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer <span class="co">[</span><span class="ot">LyProX</span><span class="co">](https://lyprox.org)</span>. Each row of these tables corresponds to one patient and details in which LNL metastatic involvement was found or not, according to different diagnostic and pathologic modalities.</span>
-<span id="cb1-284"><a href="#cb1-284"></a></span>
-<span id="cb1-285"><a href="#cb1-285"></a>In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four LNLs I, II, III, and IV stratified by the primary tumor's subsite. We only included patients with tumors in the gum, floor of mouth, other/unspecified parts of the mouth, palate, oropharynx, tosil, base of tongue, and other/unspecified parts of tongue, resulting in {{&lt; var num_patients.total &gt;}} patients.</span>
-<span id="cb1-286"><a href="#cb1-286"></a></span>
-<span id="cb1-287"><a href="#cb1-287"></a></span>
-<span id="cb1-288"><a href="#cb1-288"></a><span class="fu"># Results {#sec-results}</span></span>
-<span id="cb1-289"><a href="#cb1-289"></a></span>
-<span id="cb1-290"><a href="#cb1-290"></a>Works super well, of course!</span>
-<span id="cb1-291"><a href="#cb1-291"></a></span>
-<span id="cb1-292"><a href="#cb1-292"></a><span class="al">![Assignment of each subsite to each of the two clusters. The fruther left a subsite, the more it is assigned to cluster A, the further right, the more to cluster B. The size of the marker (area) corresponds to the number of patients in the subsite.](../figures/cluster_assignments.svg)</span>{#fig-cluster-assignments}</span>
-<span id="cb1-293"><a href="#cb1-293"></a></span>
-<span id="cb1-294"><a href="#cb1-294"></a></span>
-<span id="cb1-295"><a href="#cb1-295"></a><span class="fu"># Discussion {#sec-discussion}</span></span>
-<span id="cb1-296"><a href="#cb1-296"></a></span>
-<span id="cb1-297"><a href="#cb1-297"></a>All that's left is for other people to bring this into clinical practice.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-265"><a href="#cb1-265"></a>We have previously developed a model of lymphatic progression of HNSCC using HMM, which allows us to estimate the probability of occult lymph node metastases in clinically negative LNLs. Mixture models are a suitable method to incorporate the primary tumor location into the model, which allows us to account for differences in lymph node involvement for different subsites. Future work will extend the work to tumors in the hypopharynx and larynx and optimize the number of model components.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
