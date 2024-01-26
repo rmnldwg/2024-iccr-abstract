@@ -1,4 +1,5 @@
 dvc==3.40.0
 git+https://github.com/rmnldwg/lyscripts@db3003688d3cac0aab6c2ef6725b8845e5ee34cb
+git+https://github.com/rmnldwg/lymph@7930717e3717c3e236afd7ea5089a624f9ad2515
 tueplots==0.0.12
 seaborn==0.13.1
