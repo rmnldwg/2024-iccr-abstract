@@ -50,11 +50,11 @@ def str2bool(v: str) -> bool | None:
     """Transform a string to a boolean or ``None``."""
     if isinstance(v, bool):
         return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+    if v.lower() in ('yes', 'true', 't'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower() in ('no', 'false', 'f'):
         return False
-    elif v.lower() in ('none', 'null', ''):
+    elif v.lower() in ('none', 'null', 'n'):
         return None
     else:
         raise argparse.ArgumentTypeError('Boolean or None value expected.')

@@ -2,3 +2,7 @@ project:
   type: website
   render: 
     - "content/*.qmd"
+  output-dir: _site
+  preview: 
+    browser: false
+    port: 8000

@@ -38,6 +38,10 @@ def create_parser() -> argparse.ArgumentParser:
         "-p", "--params", type=Path, default="_variables.yml",
         help="Path to the parameter file. Looks for a key `barplot_kwargs`.",
     )
+    parser.add_argument(
+        "-s", "--seed", type=int, default=42,
+        help="Seed for the random number generator.",
+    )
     return parser
 
 
@@ -69,6 +73,7 @@ def main():
         mapping=lambda x: "all",
     )
 
+    np.random.seed(args.seed)
     _chain, cluster_components, history = mixture_model.fit(
         em_config=params["mixture_model"]["em_config"],
         mcmc_config=params["mixture_model"]["mcmc_config"],

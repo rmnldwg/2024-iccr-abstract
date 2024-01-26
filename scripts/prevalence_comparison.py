@@ -5,9 +5,12 @@ compare it to the prevalence of involvement in the data.
 import argparse
 from pathlib import Path
 import yaml
+import math
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import StrMethodFormatter
+from tueplots import figsizes, fontsizes
 import h5py
 from emcee.backends import HDFBackend
 from lyscripts.utils import load_patient_data, create_model_from_config
@@ -15,6 +18,7 @@ from lyscripts.predict.prevalences import (
     compute_observed_prevalence,
     generate_predicted_prevalences,
 )
+from lyscripts.plot.utils import COLORS as USZ
 
 from helpers import str2bool, OROPHARYNX_ICDS, SUBSITE, T_STAGE, LNLS
 
@@ -45,19 +49,19 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to the parameter file..",
     )
     parser.add_argument(
-        "-i", "--involvement", nargs=4, type=str2bool, required=True,
-        help="Involvement pattern to compare the prevalences for.",
+        "-l", "--lnl", type=str, choices=LNLS, default="II",
+        help="LNL to plot involvement prevalence for.",
     )
     parser.add_argument(
         "-s", "--subsite", type=str, default="C01",
         help="ICD code of the subsite to plot the prevalences for.",
     )
     parser.add_argument(
-        "--thin-indie", type=int, default=10,
+        "--thin-indie", type=int, default=2,
         help="Thinning factor for the independent model's chain.",
     )
     parser.add_argument(
-        "--thin-mixture", type=int, default=1000,
+        "--thin-mixture", type=int, default=200,
         help="Thinning factor for the mixture model's chain.",
     )
     return parser
@@ -72,18 +76,22 @@ def main():
     lymph_model = create_model_from_config(params)
     lymph_model.modalities = {"max_llh": [1., 1.]}
 
-    pattern = {"ipsi": {lnl: val for lnl, val in zip(LNLS, args.involvement)}}
+    pattern = {"ipsi": {}}
+    for lnl in LNLS:
+        pattern["ipsi"][lnl] = None
+        if lnl == args.lnl:
+            pattern["ipsi"][lnl] = True
+
     patient_data = load_patient_data(args.data)
     patient_data[T_STAGE] = ["all"] * len(patient_data)
 
-    if args.subsite in OROPHARYNX_ICDS:
-        print("using oropharynx model")
+    location = "oropharynx" if args.subsite in OROPHARYNX_ICDS else "oral cavity"
+    if location == "oropharynx":
         indie_chain = HDFBackend(
             args.mixture_model.parent / "oropharynx.hdf5",
             read_only=True,
         ).get_chain(flat=True, thin=args.thin_indie)
     else:
-        print("using oral cavity model")
         indie_chain = HDFBackend(
             args.mixture_model.parent / "oral_cavity.hdf5",
             read_only=True,
@@ -91,7 +99,7 @@ def main():
 
     mixture_chain = HDFBackend(
         args.mixture_model, read_only=True,
-    ).get_chain(flat=True, thin=args.thin_mixture)
+    ).get_chain(flat=True, thin=args.thin_mixture, discard=1000)
     with h5py.File(args.mixture_model, mode="r") as h5_file:
         cluster_assignments = h5_file["em/cluster_components"][...]
     idx = list(params["icd_code_map"].keys()).index(args.subsite)
@@ -131,10 +139,57 @@ def main():
         cluster_A_prob * cluster_A_prevs
         + cluster_B_prob * cluster_B_prevs
     )
+    total_min = math.floor(np.min([
+        independent_prevs.min(),
+        mixture_model_prevs.min(),
+        matching / total,
+    ]) * 100) / 100
+    total_max = math.ceil(np.max([
+        independent_prevs.max(),
+        mixture_model_prevs.max(),
+        matching / total,
+    ]) * 100) / 100
+
+    plt.rcParams.update(figsizes.icml2022_half())
+    plt.rcParams.update(fontsizes.icml2022())
+    fig, ax = plt.subplots()
+
+    _, bins, _ = ax.hist(
+        independent_prevs,
+        bins=20,
+        range=(total_min, total_max),
+        density=True,
+        histtype="stepfilled",
+        label=f"independent {location} model",
+        color=USZ["blue"],
+        alpha=0.8,
+    )
+    ax.hist(
+        mixture_model_prevs,
+        bins=bins,
+        density=True,
+        histtype="stepfilled",
+        label=f"mixture model for subsite {args.subsite}",
+        color=USZ["orange"],
+        alpha=0.8,
+    )
+    ax.axvline(
+        matching / total,
+        color=USZ["red"],
+        linestyle="--",
+        label=f"observed ({matching} of {total})",
+    )
+    ax.legend()
+    ax.xaxis.set_major_formatter(StrMethodFormatter("{x:.0%}"))
+    ax.set_yticks([])
+
+    plt.savefig(args.output, bbox_inches="tight", dpi=300)
 
     print(f"Observed prevalence:    {matching / total:.2%}")
     print(f"Independent prevalence: {independent_prevs.mean():.2%}")
     print(f"Mixture prevalence:     {mixture_model_prevs.mean():.2%}")
+
+
 
 if __name__ == "__main__":
     main()

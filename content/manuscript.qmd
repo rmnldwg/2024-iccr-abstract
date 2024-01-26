@@ -139,7 +139,7 @@ abstract: |
   extend the model to other tumor subsites, defined by ICD-10 codes, in the head and
   neck, we employ a mixture of these HMMs and learn the cluster assignments and model
   parameters in an iterative, EM-like algorithm from multi-centric data. The mixture
-  model manages to cluster anatomically close subsites and correctly infers the
+  model manages to group anatomically close subsites and correctly infers the
   clusters' parameters. Using this mixture model allows the prediction of individual
   risks of occult nodal disease, given a diagnosis that includes tumor subsite.
 format:
@@ -265,7 +265,9 @@ $$
 
 ## Implementation {#sec-implementation}
 
-We did this in this and that fashion...
+In our implementation of the EM alorithm, we alternated between the following two steps:
+
+1. Given a set of $\boldsymbol{\pi}^\star$, we sampled new cluster parameters $\boldsymbol{\theta}^\star$ from the . we ran 7 times {{< var mixture_model.em_config.e_step.walkers_per_dim >}} parallel `emcee` walkers for  {{< var mixture_model.em_config.e_step.nburnin >}} steps and discarded the results as burn-in. Then, we completed another {{< var mixture_model.em_config.e_step.nsteps >}} steps and used 
 
 
 ## Multi-Centric Data

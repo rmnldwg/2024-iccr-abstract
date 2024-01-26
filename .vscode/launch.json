@@ -5,15 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "lyscripts sample",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "lyscripts",
+            "justMyCode": false,
+            "args": [
+                "sample", "data/oral_cavity.csv", "models/oral_cavity.hdf5",
+                "--params", "_variables.yml",
+                "--plots", "figures/sample_from_oral_cavity",
+                "--pools", "0",
+                "--seed", "42"
+            ]
+        },
+        {
             "name": "prevalence comparison",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
-                "--involvement", "none", "true", "none", "none",
-                "--subsite", "C01"
+                "--involvement",
+                "none",
+                "true",
+                "none",
+                "none",
+                "--subsite",
+                "C01"
             ]
         },
         {
