@@ -179,6 +179,7 @@ pyrightconfig.json
 /.quarto/
 /content/*
 !/content/*.qmd
+!/content/*.tex
 /_site/
 /site_libs/
 /_site
