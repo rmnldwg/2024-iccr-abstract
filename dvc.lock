@@ -311,16 +311,16 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: a407bc73268e3341cabb51f13f1b102d
-      size: 19493
+      md5: 932ad1ffe64b0e5eb23d9bd95c2aaa64
+      size: 17876
     - path: figures
       hash: md5
-      md5: 57319df17f4b5da9462677650a5dde1f.dir
-      size: 1178938
+      md5: c71b905534ae8c34fb742f9536ec43a5.dir
+      size: 1355310
       nfiles: 44
     - path: models
       hash: md5
-      md5: abdb2a83b7c5d52fe2e67b1adaf6441b.dir
+      md5: aacfd20d1bf7aaa820b038f6e7aecd04.dir
       size: 63333481
       nfiles: 4
     - path: static
@@ -345,12 +345,13 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: 53d7705c2aefad49bc557890b036781a.dir
-      size: 626049
-      nfiles: 5
+      md5: 34536eddcca38f14df1b69513ee19f83.dir
+      size: 898896
+      nfiles: 6
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
-      models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml\n"
+      models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml
+      --seed 42\n"
     deps:
     - path: data/enhanced.csv
       hash: md5
@@ -358,8 +359,8 @@ stages:
       size: 997595
     - path: scripts/mixture_model_sampling.py
       hash: md5
-      md5: 94b528ef0cabe15ab8ee2a505ebb9c26
-      size: 2971
+      md5: d08e1345f3a245448cf16d5d711e699f
+      size: 3132
     params:
       _variables.yml:
         mixture_model:
@@ -390,11 +391,11 @@ stages:
     outs:
     - path: figures/mixture_history.svg
       hash: md5
-      md5: fce85adc923d33d672399e98ca8628d4
-      size: 72036
+      md5: f504fa39816dcc7787aec4fb5e9ce0f5
+      size: 68772
     - path: models/mixture.hdf5
       hash: md5
-      md5: ac806b9608daec34d2f2be89d675a623
+      md5: 24fc8e405444106bed654115564189c9
       size: 60425400
   plot_cluster_assignments:
     cmd: "python scripts/plot_cluster_assignments.py --model models/mixture.hdf5 --output
@@ -2217,3 +2218,1881 @@ stages:
       hash: md5
       md5: 7a0c676d293872ef90147a8f4818e526
       size: 30829
+  plot_component_assignments:
+    cmd: "python scripts/plot_component_assignments.py --model models/mixture.hdf5
+      --output figures/cluster_assignments.svg --params _variables.yml\n"
+    deps:
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: scripts/plot_component_assignments.py
+      hash: md5
+      md5: 0b96a5e2dd0e26c171f68e0b84e0fd0e
+      size: 3426
+    params:
+      _variables.yml:
+        num_patients:
+          C01: 212
+          C02: 158
+          C03: 45
+          C04: 99
+          C05: 61
+          C06: 46
+          C09: 452
+          C10: 169
+          total: 1242
+    outs:
+    - path: figures/cluster_assignments.svg
+      hash: md5
+      md5: 6ae94f7c9122a9246911b91cf812c631
+      size: 37958
+  plot_predicted_prevalence@I-C01:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C01 --output figures/prevalence_C01_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C01_I.svg
+      hash: md5
+      md5: 8160acb195d80367c6b1dd4b751c2948
+      size: 27240
+  plot_predicted_prevalence@I-C02:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C02 --output figures/prevalence_C02_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C02_I.svg
+      hash: md5
+      md5: 6a449fb3b2e368c48e83eb24f26b26e4
+      size: 28721
+  plot_predicted_prevalence@I-C03:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C03 --output figures/prevalence_C03_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C03_I.svg
+      hash: md5
+      md5: 5fe90429dc1808784b3fe98ebcbd417d
+      size: 27248
+  plot_predicted_prevalence@I-C04:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C04 --output figures/prevalence_C04_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C04_I.svg
+      hash: md5
+      md5: 8f6e357813f86644862fe28f8a1fa7db
+      size: 28761
+  plot_predicted_prevalence@I-C05:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C05 --output figures/prevalence_C05_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C05_I.svg
+      hash: md5
+      md5: 0b97d8f55c54708d057592cd26492a90
+      size: 28601
+  plot_predicted_prevalence@I-C06:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C06 --output figures/prevalence_C06_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C06_I.svg
+      hash: md5
+      md5: 1137ea28f5a0c956aeeff243043b7694
+      size: 28802
+  plot_predicted_prevalence@I-C09:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C09 --output figures/prevalence_C09_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C09_I.svg
+      hash: md5
+      md5: 2d35cb01a3fc24d1f6f47488b7fa13cd
+      size: 28378
+  plot_predicted_prevalence@I-C10:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl I --subsite C10 --output figures/prevalence_C10_I.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C10_I.svg
+      hash: md5
+      md5: bfe7af7dd8c817c1c7698f23c26a11bb
+      size: 28416
+  plot_predicted_prevalence@II-C01:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C01 --output figures/prevalence_C01_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C01_II.svg
+      hash: md5
+      md5: 4bf8db6be58edb17d43f15278f40d97b
+      size: 29667
+  plot_predicted_prevalence@II-C02:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C02 --output figures/prevalence_C02_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C02_II.svg
+      hash: md5
+      md5: 1a42610e153af6e4424b4e9756156d9a
+      size: 29469
+  plot_predicted_prevalence@II-C03:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C03 --output figures/prevalence_C03_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C03_II.svg
+      hash: md5
+      md5: 1b7741a1688194effaa56bf639de6a52
+      size: 28606
+  plot_predicted_prevalence@II-C04:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C04 --output figures/prevalence_C04_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C04_II.svg
+      hash: md5
+      md5: 5bbd859e59c82eca3e53aab53acdb014
+      size: 30353
+  plot_predicted_prevalence@II-C05:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C05 --output figures/prevalence_C05_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C05_II.svg
+      hash: md5
+      md5: 8fc341703094955d69bafc15dec9cdaa
+      size: 28752
+  plot_predicted_prevalence@II-C06:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C06 --output figures/prevalence_C06_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C06_II.svg
+      hash: md5
+      md5: 01f0bf19f4999b3de52794e2ef35ffd2
+      size: 27822
+  plot_predicted_prevalence@II-C09:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C09 --output figures/prevalence_C09_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C09_II.svg
+      hash: md5
+      md5: b278a755c3526ad8d944234b75046aaa
+      size: 29573
+  plot_predicted_prevalence@II-C10:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl II --subsite C10 --output figures/prevalence_C10_II.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C10_II.svg
+      hash: md5
+      md5: 077ff8ccb5717a4c86fa7675fbd1e2d6
+      size: 29488
+  plot_predicted_prevalence@III-C01:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C01 --output figures/prevalence_C01_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C01_III.svg
+      hash: md5
+      md5: 9de2c3bfb03979146d0c7545278778e5
+      size: 29065
+  plot_predicted_prevalence@III-C02:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C02 --output figures/prevalence_C02_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C02_III.svg
+      hash: md5
+      md5: 1d24946f3dff0cd890955ecd270334c0
+      size: 29907
+  plot_predicted_prevalence@III-C03:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C03 --output figures/prevalence_C03_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C03_III.svg
+      hash: md5
+      md5: 68bd4edebdc9ed8b84ab8d83373e3e6e
+      size: 26833
+  plot_predicted_prevalence@III-C04:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C04 --output figures/prevalence_C04_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C04_III.svg
+      hash: md5
+      md5: a7d00158214e54f45f32869679be3efe
+      size: 29453
+  plot_predicted_prevalence@III-C05:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C05 --output figures/prevalence_C05_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C05_III.svg
+      hash: md5
+      md5: 6866baef72960ccb33dbf861a2ac5371
+      size: 29762
+  plot_predicted_prevalence@III-C06:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C06 --output figures/prevalence_C06_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C06_III.svg
+      hash: md5
+      md5: d392eee312af0f93d4f1ffedd33b9d1f
+      size: 29859
+  plot_predicted_prevalence@III-C09:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C09 --output figures/prevalence_C09_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C09_III.svg
+      hash: md5
+      md5: 39b8ea2ab88e7aa0ccfc04a077fcb536
+      size: 30190
+  plot_predicted_prevalence@III-C10:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl III --subsite C10 --output figures/prevalence_C10_III.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C10_III.svg
+      hash: md5
+      md5: afd7f738e8c2f52760ebfb6eb5349642
+      size: 30629
+  plot_predicted_prevalence@IV-C01:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C01 --output figures/prevalence_C01_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C01_IV.svg
+      hash: md5
+      md5: 2d39468325472e27a5f12afdfe0fdce3
+      size: 30624
+  plot_predicted_prevalence@IV-C02:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C02 --output figures/prevalence_C02_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C02_IV.svg
+      hash: md5
+      md5: e863c3c7c4706ffc96d69366197eecb7
+      size: 31061
+  plot_predicted_prevalence@IV-C03:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C03 --output figures/prevalence_C03_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C03_IV.svg
+      hash: md5
+      md5: f92b8183b74034f2c9a696aaeb812ee2
+      size: 28800
+  plot_predicted_prevalence@IV-C04:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C04 --output figures/prevalence_C04_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C04_IV.svg
+      hash: md5
+      md5: d5734dbf1b39ff258334e2384e51b7d5
+      size: 28218
+  plot_predicted_prevalence@IV-C05:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C05 --output figures/prevalence_C05_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C05_IV.svg
+      hash: md5
+      md5: 3690a6cacd4f198d9b982a6789e9fc03
+      size: 28329
+  plot_predicted_prevalence@IV-C06:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C06 --output figures/prevalence_C06_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C06_IV.svg
+      hash: md5
+      md5: 3ddef704fe527578cc88ccfa996f801f
+      size: 27139
+  plot_predicted_prevalence@IV-C09:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C09 --output figures/prevalence_C09_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C09_IV.svg
+      hash: md5
+      md5: ef60ff7a1eb5bb89bff25257d1e1e6a5
+      size: 30493
+  plot_predicted_prevalence@IV-C10:
+    cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
+      --params _variables.yml --lnl IV --subsite C10 --output figures/prevalence_C10_IV.svg\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_comparison.py
+      hash: md5
+      md5: 252825e607fe66f4996c9f7ba62e6bcd
+      size: 5800
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_C10_IV.svg
+      hash: md5
+      md5: 2d77e6f39230f4f1e43b685113e89bb0
+      size: 30831
+  prevalence_superplot:
+    cmd: "python scripts/prevalence_superplot.py --data data/enhanced.csv --models
+      models/ --output figures/prevalence_comparison.svg --params _variables.yml --lnls
+      I II III --subsites C01 C09 C05 --thin-indie 1 --thin-mixture 75\n"
+    deps:
+    - path: data/enhanced.csv
+      hash: md5
+      md5: 8ed98ad0206f0114124a8b7da30961c5
+      size: 997595
+    - path: models/mixture.hdf5
+      hash: md5
+      md5: 24fc8e405444106bed654115564189c9
+      size: 60425400
+    - path: models/oral_cavity.hdf5
+      hash: md5
+      md5: cc03dc96b1ac9deba1ad09a4343ae840
+      size: 1454016
+    - path: models/oropharynx.hdf5
+      hash: md5
+      md5: 23acf157edb04fc27f33f60456ac189b
+      size: 1454016
+    - path: scripts/prevalence_superplot.py
+      hash: md5
+      md5: df0eecb682e11733a903a89a13f8839f
+      size: 6640
+    params:
+      _variables.yml:
+        icd_code_map:
+          C01: base of tongue
+          C02: tongue, other
+          C03: gum
+          C04: floor of mouth
+          C05: palate
+          C06: mouth, other
+          C09: tonsil
+          C10: oropharynx, other
+        model:
+          class: Unilateral
+          first_binom_prob: 0.3
+          kwargs:
+            base_symmetric: false
+            trans_symmetric: true
+            use_mixing: true
+          max_t: 10
+          t_stage_mapping:
+            0: all
+            1: all
+            2: all
+            3: all
+            4: all
+          t_stages:
+          - all
+    outs:
+    - path: figures/prevalence_comparison.svg
+      hash: md5
+      md5: ae14b91e51a895410b43c703b5b5a4c8
+      size: 127437

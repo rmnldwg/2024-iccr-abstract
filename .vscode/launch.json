@@ -5,17 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "superplot",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": "${command:pickArgs}"
+        },
+        {
             "name": "lyscripts sample",
             "type": "debugpy",
             "request": "launch",
             "module": "lyscripts",
             "justMyCode": false,
             "args": [
-                "sample", "data/oral_cavity.csv", "models/oral_cavity.hdf5",
-                "--params", "_variables.yml",
-                "--plots", "figures/sample_from_oral_cavity",
-                "--pools", "0",
-                "--seed", "42"
+                "sample",
+                "data/oral_cavity.csv",
+                "models/oral_cavity.hdf5",
+                "--params",
+                "_variables.yml",
+                "--plots",
+                "figures/sample_from_oral_cavity",
+                "--pools",
+                "0",
+                "--seed",
+                "42"
             ]
         },
         {
@@ -26,11 +40,8 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
-                "--involvement",
-                "none",
-                "true",
-                "none",
-                "none",
+                "--lnl",
+                "II",
                 "--subsite",
                 "C01"
             ]

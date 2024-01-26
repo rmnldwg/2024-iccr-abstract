@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
 from tueplots import figsizes, fontsizes
-import h5py
 from emcee.backends import HDFBackend
 from lyscripts.utils import load_patient_data, create_model_from_config
 from lyscripts.predict.prevalences import (
@@ -20,8 +19,15 @@ from lyscripts.predict.prevalences import (
 )
 from lyscripts.plot.utils import COLORS as USZ
 
-from helpers import str2bool, OROPHARYNX_ICDS, SUBSITE, T_STAGE, LNLS
-
+from helpers import (
+    SUBSITE,
+    T_STAGE,
+    LNLS,
+    get_indie_chain,
+    get_location,
+    get_mixture_components,
+    get_prevalence_pattern,
+)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -76,35 +82,26 @@ def main():
     lymph_model = create_model_from_config(params)
     lymph_model.modalities = {"max_llh": [1., 1.]}
 
-    pattern = {"ipsi": {}}
-    for lnl in LNLS:
-        pattern["ipsi"][lnl] = None
-        if lnl == args.lnl:
-            pattern["ipsi"][lnl] = True
+    pattern = get_prevalence_pattern(for_lnl=args.lnl)
+    location = get_location(for_subsite=args.subsite)
 
     patient_data = load_patient_data(args.data)
     patient_data[T_STAGE] = ["all"] * len(patient_data)
 
-    location = "oropharynx" if args.subsite in OROPHARYNX_ICDS else "oral cavity"
-    if location == "oropharynx":
-        indie_chain = HDFBackend(
-            args.mixture_model.parent / "oropharynx.hdf5",
-            read_only=True,
-        ).get_chain(flat=True, thin=args.thin_indie)
-    else:
-        indie_chain = HDFBackend(
-            args.mixture_model.parent / "oral_cavity.hdf5",
-            read_only=True,
-        ).get_chain(flat=True, thin=args.thin_indie)
-
+    indie_chain = get_indie_chain(
+        from_dir=args.mixture_model.parent,
+        for_location=location,
+        thin_by=args.thin_indie,
+    )
     mixture_chain = HDFBackend(
         args.mixture_model, read_only=True,
     ).get_chain(flat=True, thin=args.thin_mixture, discard=1000)
-    with h5py.File(args.mixture_model, mode="r") as h5_file:
-        cluster_assignments = h5_file["em/cluster_components"][...]
-    idx = list(params["icd_code_map"].keys()).index(args.subsite)
-    cluster_A_prob = cluster_assignments[idx]
-    cluster_B_prob = 1 - cluster_A_prob
+
+    comp_A_prob, comp_B_prob = get_mixture_components(
+        from_dir=args.mixture_model.parent,
+        for_subsite=args.subsite,
+        icd_code_map=params["icd_code_map"],
+    )
 
     matching, total = compute_observed_prevalence(
         pattern=pattern,
@@ -121,14 +118,14 @@ def main():
         t_stage="all",
         modality_spsn=[1., 1.],
     )))
-    cluster_A_prevs = np.array(list(generate_predicted_prevalences(
+    comp_A_prevs = np.array(list(generate_predicted_prevalences(
         pattern=pattern,
         model=lymph_model,
         samples=mixture_chain[:,:7],
         t_stage="all",
         modality_spsn=[1., 1.],
     )))
-    cluster_B_prevs = np.array(list(generate_predicted_prevalences(
+    comp_B_prevs = np.array(list(generate_predicted_prevalences(
         pattern=pattern,
         model=lymph_model,
         samples=mixture_chain[:,7:],
@@ -136,9 +133,10 @@ def main():
         modality_spsn=[1., 1.],
     )))
     mixture_model_prevs = (
-        cluster_A_prob * cluster_A_prevs
-        + cluster_B_prob * cluster_B_prevs
+        comp_A_prob * comp_A_prevs
+        + comp_B_prob * comp_B_prevs
     )
+
     total_min = math.floor(np.min([
         independent_prevs.min(),
         mixture_model_prevs.min(),
@@ -188,7 +186,6 @@ def main():
     print(f"Observed prevalence:    {matching / total:.2%}")
     print(f"Independent prevalence: {independent_prevs.mean():.2%}")
     print(f"Mixture prevalence:     {mixture_model_prevs.mean():.2%}")
-
 
 
 if __name__ == "__main__":

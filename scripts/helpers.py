@@ -1,9 +1,12 @@
 """
 Helper functions for the scripts.
 """
+from pathlib import Path
 from typing import Generator
 import argparse
+from emcee.backends import HDFBackend
 
+import h5py
 from lyscripts.plot.utils import COLORS as USZ
 from matplotlib.colors import to_rgba
 
@@ -58,3 +61,53 @@ def str2bool(v: str) -> bool | None:
         return None
     else:
         raise argparse.ArgumentTypeError('Boolean or None value expected.')
+
+
+def get_location(for_subsite):
+    """Return the location of the given subsite."""
+    if for_subsite in OROPHARYNX_ICDS:
+        return "oropharynx"
+    else:
+        return "oral cavity"
+
+
+def get_indie_chain(from_dir: Path, for_location: str, thin_by: int):
+    """Get the independent model's chain from the given directory."""
+    if for_location == "oropharynx":
+        indie_chain = HDFBackend(
+            from_dir / "oropharynx.hdf5",
+            read_only=True,
+        ).get_chain(flat=True, thin=thin_by)
+    else:
+        indie_chain = HDFBackend(
+            from_dir / "oral_cavity.hdf5",
+            read_only=True,
+        ).get_chain(flat=True, thin=thin_by)
+
+    return indie_chain
+
+
+def get_mixture_components(
+    from_dir: Path,
+    for_subsite: str,
+    icd_code_map: dict,
+) -> tuple[float, float]:
+    """Get the mixture model's components from the given directory."""
+    with h5py.File(from_dir / "mixture.hdf5", mode="r") as h5_file:
+        component_assignments = h5_file["em/cluster_components"][...]
+
+    idx = list(icd_code_map.keys()).index(for_subsite)
+    comp_A_prob = component_assignments[idx]
+    comp_B_prob = 1 - comp_A_prob
+
+    return comp_A_prob, comp_B_prob
+
+
+def get_prevalence_pattern(for_lnl: str) -> dict[str, dict[str, bool | None]]:
+    """Create a pattern correpsonding to the prevalence of one LNL's involvement."""
+    pattern = {"ipsi": {}}
+    for lnl in LNLS:
+        pattern["ipsi"][lnl] = None
+        if lnl == for_lnl:
+            pattern["ipsi"][lnl] = True
+    return pattern

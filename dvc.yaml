@@ -68,7 +68,8 @@ stages:
         - barplot_kwargs
         - icd_code_map
     outs:
-      - figures/prevalence_by_subsite.svg
+      - figures/prevalence_by_subsite.svg:
+          cache: false
 
   filter_oropharynx:
     cmd: >
@@ -143,6 +144,7 @@ stages:
       --model models/mixture.hdf5
       --figure figures/mixture_history.svg
       --params _variables.yml
+      --seed 42
     deps:
       - scripts/mixture_model_sampling.py
       - data/enhanced.csv
@@ -150,43 +152,33 @@ stages:
       - _variables.yml:
           - mixture_model
     outs:
-      - figures/mixture_history.svg
+      - figures/mixture_history.svg:
+          cache: false
       - models/mixture.hdf5
 
-  plot_cluster_assignments:
+  plot_component_assignments:
     cmd: >
-      python scripts/plot_cluster_assignments.py
+      python scripts/plot_component_assignments.py
       --model models/mixture.hdf5
       --output figures/cluster_assignments.svg
       --params _variables.yml
     deps:
       - models/mixture.hdf5
-      - scripts/plot_cluster_assignments.py
+      - scripts/plot_component_assignments.py
     params:
       - _variables.yml:
           - num_patients
     outs:
-      - figures/cluster_assignments.svg
+      - figures/cluster_assignments.svg:
+          cache: false
 
   plot_predicted_prevalence:
     matrix:
-      pattern:
-        - I: "t"
-          II: "n"
-          III: "n"
-          IV: "n"
-        - I: "n"
-          II: "t"
-          III: "n"
-          IV: "n"
-        - I: "n"
-          II: "n"
-          III: "t"
-          IV: "n"
-        - I: "n"
-          II: "n"
-          III: "n"
-          IV: "t"
+      lnl:
+        - I
+        - II
+        - III
+        - IV
       icd:
         - C01
         - C02
@@ -200,9 +192,9 @@ stages:
       python scripts/prevalence_comparison.py
       --mixture-model models/mixture.hdf5
       --params _variables.yml
-      --involvement ${item.pattern.I} ${item.pattern.II} ${item.pattern.III} ${item.pattern.IV}
+      --lnl ${item.lnl}
       --subsite ${item.icd}
-      --output figures/prevalence_${item.icd}_${item.pattern.I}${item.pattern.II}${item.pattern.III}${item.pattern.IV}.svg
+      --output figures/prevalence_${item.icd}_${item.lnl}.svg
     deps:
       - models/oropharynx.hdf5
       - models/oral_cavity.hdf5
@@ -214,7 +206,34 @@ stages:
           - model
           - icd_code_map
     outs:
-      - figures/prevalence_${item.icd}_${item.pattern.I}${item.pattern.II}${item.pattern.III}${item.pattern.IV}.svg
+      - figures/prevalence_${item.icd}_${item.lnl}.svg:
+          cache: false
+
+  prevalence_superplot:
+    cmd: >
+      python scripts/prevalence_superplot.py
+      --data data/enhanced.csv
+      --models models/
+      --output figures/prevalence_comparison.svg
+      --params _variables.yml
+      --lnls I II III
+      --subsites C01 C09 C05
+      --thin-indie 1
+      --thin-mixture 75
+    deps:
+      - scripts/prevalence_superplot.py
+      - data/enhanced.csv
+      - models/mixture.hdf5
+      - models/oropharynx.hdf5
+      - models/oral_cavity.hdf5
+    params:
+      - _variables.yml:
+          - model
+          - icd_code_map
+    outs:
+      - figures/prevalence_comparison.svg:
+          cache: false
+
 
   render_pdf:
     cmd: >
