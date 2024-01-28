@@ -83,13 +83,13 @@ def main():
             }
         )
 
-    bottom_ax.set_xlabel("assignment to component B")
+    bottom_ax.set_xlabel("assignment to component A")
     bottom_ax.xaxis.set_major_formatter(StrMethodFormatter("{x:.0%}"))
     top_ax = bottom_ax.secondary_xaxis(
         location="top",
         functions=(lambda x: 1. - x, lambda x: 1. - x),
     )
-    top_ax.set_xlabel("assignment to component A")
+    top_ax.set_xlabel("assignment to component B")
     top_ax.xaxis.set_major_formatter(StrMethodFormatter("{x:.0%}"))
     bottom_ax.set_yticks([])
     bottom_ax.grid(axis="x", alpha=0.5, color=USZ["gray"], linestyle=":")

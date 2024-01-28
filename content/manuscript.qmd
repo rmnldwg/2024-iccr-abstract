@@ -19,6 +19,10 @@ author:
     affiliations:
       - ref: 1
       - ref: 2
+  - name: Panagiotis Balermpas
+    orcid: 0000-0001-5261-6446
+    affiliations:
+      - ref: 2
   - name: Sergi Benavente
     orcid: 0000-0002-2700-3522
     affiliations:
@@ -38,10 +42,6 @@ author:
     orcid: 0000-0003-1193-0863
     affiliations:
       - ref: 2
-  - name: Sandrine Werlen
-    affiliations:
-      - ref: 4
-      - ref: 5
   - name: Olgun Elicin
     orcid: 0000-0002-6996-0646
     affiliations:
@@ -51,26 +51,18 @@ author:
     affiliations:
       - ref: 6
       - ref: 10
-  - name: Philippe Zrounba
-    orcid: 0000-0001-6223-6113
-    affiliations:
-      - ref: 9
   - name: Bertrand Poumayou
     orcid: 0000-0002-8060-7827
     affiliations:
       - ref: 2
-  - name: Panagiotis Balermpas
-    orcid: 0000-0001-5261-6446
-    affiliations:
-      - ref: 2
-  - name: Vincent Grégoire
-    affiliations:
-      - ref: 8
   - name: Roland Giger
     orcid: 0000-0002-5574-3210
     affiliations:
       - ref: 4
       - ref: 5
+  - name: Vincent Grégoire
+    affiliations:
+      - ref: 8
   - name: Jan Unkelbach
     orcid: 0000-0002-4275-990X
     affiliations:
@@ -134,14 +126,7 @@ affiliations:
     country: Spain
 bibliography: ../references.bib
 abstract: |
-  We previously developed a mechanistic hidden Markov model (HMM) to predict the
-  lymphatic tumor progression in oropharyngeal squamous cell carcinomas (OPSCCs). To
-  extend the model to other tumor subsites, defined by ICD-10 codes, in the head and
-  neck, we employ a mixture of these HMMs and learn the cluster assignments and model
-  parameters in an iterative, EM-like algorithm from multi-centric data. The mixture
-  model manages to group anatomically close subsites and correctly infers the
-  clusters' parameters. Using this mixture model allows the prediction of individual
-  risks of occult nodal disease, given a diagnosis that includes tumor subsite.
+  We previously developed a mechanistic hidden Markov model (HMM) to predict the lymphatic tumor progression in oropharyngeal squamous cell carcinomas. To extend the model to other tumor subsites in the head and neck defined by ICD-10 codes, we develop a mixture model combining multiple HMMs. The mixture coefficients and the model parameters are learned via an EM-like algorithm from a large multi-centric dataset on lymph node involvement. The methodology is demonstrated for tumors in the oropharynx and oral cavity. The mixture model groups anatomically nearly subsites and yields interpretable mixture coefficients consistent with anatomical location. It allows the prediction of differences in lymph node involvement depending on tumor subsite.
 format:
   iccr-pdf:
     keep-tex: true
@@ -159,41 +144,41 @@ crossref:
 
 # Introduction
 
-Head and neck squamous cell carcinomas (HNSCC) frequently spread through the lymphatic system [@lindberg_distribution_1972;@woolgar_histological_1999]. Current diagnostic imaging modalities are unable to detect microscopic lymph node metastases [@snyder_petct_2021;@strohl_petct_2021]. To avoid nodal recurrences [@ho_decision_2014], large volumes in the neck are irradiated electively, which are at risk of harbouring occult disease. Guidelines about which lymph node levels (LNLs) to irradiate [@biau_selection_2019] are currently not based on a patient's individual risk, but only on the overall prevalence of nodal disease as reported in the literature [@lindberg_distribution_1972;@woolgar_histological_1999].
+Head and neck squamous cell carcinomas (HNSCC) frequently spread through the lymphatic system [@lindberg_distribution_1972;@woolgar_histological_1999]. Current diagnostic imaging modalities are unable to detect microscopic lymph node metastases [@snyder_petct_2021;@strohl_petct_2021]. To avoid nodal recurrences, large volumes in the neck, which are at risk of harbouring occult disease, are irradiated electively. Guidelines about which lymph node levels (LNLs) to irradiate [@biau_selection_2019] are currently not based on a patient's individual risk, but on the overall prevalence of nodal disease as reported in the literature [@lindberg_distribution_1972;@woolgar_histological_1999].
 
-To personalize this prediction of the risk for occult disease, given a patient's individual diagnosis, we published
+To personalize the prediction of the risk for occult disease, given a patient's individual diagnosis, we published
 
-1. large, multi-centric data that reports per patient which LNLs where clinically and/or pathologically involved [@ludwig_dataset_2022;@ludwig_multi-centric_2023].
+1. large, multi-centric data that reports per patient which LNLs were clinically/pathologically involved [@ludwig_dataset_2022;@ludwig_multi-centric_2023].
 
 And, building on this work,
 
-2. an interpretable hidden Markov model (HMM), trained with this data, to predict the risk for occult nodal disease [@ludwig_hidden_2021], given an individual patient's diagnosis.
+2. an interpretable hidden Markov model (HMM), trained with this data, to predict the risk for occult nodal disease, given an individual patient's diagnosis [@ludwig_hidden_2021].
 
 Such a personalized risk prediction may allow clinicians to safely reduce the elective clinical target volume (CTV-N) and thus reduce side-effects that degrade the patient's quality of life [@batth_practical_2014].
 
-Here, we extend the previous work by incorporating the primary tumor location (specified as ICD-10 code) into the model of lymphatic tumour progression, focusing on tumours in the oropharynx and the oral cavity. HNSCC patients with primary tumors at different subsites show different patterns of lymphatic spread [@lindberg_distribution_1972;@woolgar_histological_1999]. So far, this could be handled by training different models for broader categories of tumour locations, e.g. oropharynx and oral cavity tumours. However, this approach does not describe differences in lymphatic spread between different subsites within the oropharynx and oral cavity. To address this issue, we present an approach using mixtures of HMMs. The intuition is that the lymphatic spread of a tumor that lies anatomically at the boarder of oropharynx and oral cavity (e.g. tumours in the palate) may be described by a mixture of different models.
+Here, we extend the previous work by incorporating the primary tumor location (specified as ICD-10 code) into the model of lymphatic tumor progression, focusing on tumors in the oropharynx and the oral cavity. HNSCC patients with primary tumors at different subsites show different patterns of lymphatic spread [@lindberg_distribution_1972;@woolgar_histological_1999]. So far, this could be handled by training different models for broader categories of tumor locations, e.g. oropharynx and oral cavity tumors. However, this approach does not describe differences in lymphatic spread between different subsites within the oropharynx and oral cavity. To address this issue, we present an approach using mixtures of HMMs. The intuition is that the lymphatic spread of a tumor that lies anatomically at the boarder of oropharynx and oral cavity (e.g. tumors in the palate) may be described by a mixture of different models.
 
 
 # Materials and Methods {#sec-materials-and-methods}
 
-Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a binary random variable (RV) $X_v$ representing the true state of that level (0 for "healthy" and 1 for "involved"). A patient's state of lymph node involvement can be represented in a random vector $\mathbf{X} = \left( X_1, X_2, \ldots, X_V \right)$. When a patient is diagnosed with HNSCC, we only observe the clinical lymph node involvement based on imaging, which we denote as another binary random variable $Y_v$. To compute the personalized risk of occult disease $\mathbf{X}$, given a diagnosis $\mathbf{Y}$, we apply Bayes' law:
+Each LNL $v \in \{ 1, 2, \ldots, V\}$ considered in our model is represented by a binary random variable $X_v$ representing the true state of that level (0 for "healthy" and 1 for "involved"). A patient's state of lymph node involvement can be represented in a random vector $\mathbf{X} = \left( X_1, X_2, \ldots, X_V \right)$. When a patient is diagnosed with HNSCC, we only observe the clinical lymph node involvement based on imaging, which we denote as another binary random variable $Y_v$. To compute the personalized risk of occult disease $\mathbf{X}$, given a diagnosis $\mathbf{Y}$, we apply Bayes' law:
 
 $$
 P \left( \mathbf{X} \mid \mathbf{Y} \right) = \frac{P \left( \mathbf{Y} \mid \mathbf{X} \right) P \left( \mathbf{X} \right)}{\sum_{\mathbf{X}^\star} P \left( \mathbf{Y} \mid \mathbf{X}^\star \right) P \left( \mathbf{X}^\star \right)}
 $$ {#eq-bayes-law}
 
-In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is given by the sensitivity and specificity of the diagnostic procedure. The term $P \left( \mathbf{X} \right)$ represents the prior probability of involvement, which depends on the probability of the tumour to spread through the lymphatic system. The main task of the HMM is to model $P \left( \mathbf{X} \right)$ and the main contribution of this paper is to incorporate the primary tutor subset into the model of $P \left( \mathbf{X} \right)$.
+In the above equation, the term $P \left( \mathbf{Y} \mid \mathbf{X} \right)$ is given by the sensitivity and specificity of the diagnostic procedure. The term $P \left( \mathbf{X} \right)$ represents the prior probability of involvement, which depends on the probability of the tumor to spread through the lymphatic system. The main task of the HMM is to model $P \left( \mathbf{X} \right)$ and the main contribution of this paper is to incorporate the primary tumor subsite into the model of $P \left( \mathbf{X} \right)$.
 
 
 ## Hidden Markov Model for Lymphatic Progression {#sec-hmm}
 
-A patient's state of lymph node involvement $\mathbf{X}[t]$ evolves over discrete time steps $t$. Let us enumerate all $2^V$ possible states, representing all combinations of LNLs. In this paper, we consider ipsilateral LNLs I, II, III and IV, which amounts to 16 possible states. The HMM is specified by _transition matrix_ $\mathbf{A}$:
+A patient's state of lymph node involvement $\mathbf{X}[t]$ evolves over discrete time steps $t$. Let us enumerate all $2^V$ possible states, representing all combinations of LNLs. In this paper, we consider ipsilateral LNLs I, II, III and IV, which amounts to 16 possible states. The HMM is specified by a _transition matrix_:
 
 $$
 \mathbf{A} = \begin{pmatrix} A_{ij} \end{pmatrix} = P \left( \mathbf{X}[t+1] = \boldsymbol{\xi}_j \mid \mathbf{X}[t] = \boldsymbol{\xi}_i \right)
 $$ {#eq-transition-matrix}
 
-which contains the conditional probabilities that a state $\mathbf{X}[t]=\boldsymbol{\xi}_i$ transitions to $\mathbf{X}[t+1]=\boldsymbol{\xi}_j$ over one time step. The transition matrix is specified and parameterised via the graphical model shown in @fig-schematic-and-graph. The red arcs in the graph of @fig-schematic-and-graph are associated the probability that the primary tumor spreads directly to a LNL (parameters $b_v$). The blue arcs describe the spread from an upstream LNL -- given it is already metastatic -- to a downstream level (parameters $t_{v-1 \rightarrow v}$).
+whose elements $A_{ij}$ contain the conditional probabilities that a state $\mathbf{X}[t]=\boldsymbol{\xi}_i$ transitions to $\mathbf{X}[t+1]=\boldsymbol{\xi}_j$ over one time step. The transition matrix is specified and parameterised via the graphical model shown in @fig-schematic-and-graph. The red arcs in the graph of @fig-schematic-and-graph (right panel) are associated with the probability that the primary tumor spreads directly to a LNL (parameters $b_v$). The blue arcs describe the spread from an upstream LNL -- given it is already metastatic -- to a downstream level (parameters $t_{v \rightarrow v+1}$).
 
 
 Now, let $\boldsymbol{\pi}$ be the _starting distribution_
@@ -202,24 +187,24 @@ $$
 \boldsymbol{\pi} = \begin{pmatrix} \pi_i \end{pmatrix} = P \left( \mathbf{X}[0] = \boldsymbol{\xi}_i \right)
 $$ {#eq-starting-distribution}
 
-denoting the probability to start in state $\boldsymbol{\xi}_i$ at time step 0. Assuming that every patient started their disease with all LNLs being healthy, we set $\pi_i$ to zero for all states  except the completly healthy state $\boldsymbol{\xi} = \begin{pmatrix} 0, 0, 0, 0 \end{pmatrix}$, which has probability 1.
+denoting the probability to start in state $\boldsymbol{\xi}_i$ at time step 0. Assuming that every patient started with all LNLs being healthy, we set $\pi_i$ to zero for all states  except the completly healthy state $\boldsymbol{\xi} = \begin{pmatrix} 0, 0, 0, 0 \end{pmatrix}$, which has probability one.
 
-Using the quantities introduced so far, the probability $P \left( \mathbf{X}[t]=\boldsymbol{\xi}_i \right)$ to be in state $i$ in time step $t$ can now be conveniently expressed as a matrix product:
+Using the quantities introduced so far, the probability $P \left( \mathbf{X}[t]=\boldsymbol{\xi}_i \right)$ to be in state $\boldsymbol{\theta}_i$ in time step $t$ can now be conveniently expressed as a matrix product:
 
 $$
 P \left( \mathbf{X}[t]=\boldsymbol{\xi}_i \right) = \left( \boldsymbol{\pi} \cdot \mathbf{A}^t \right)_i
 $$ {#eq-evolution}
 
-This evolution implicitly marginalizes over all possible paths to arrive at state $\boldsymbol{\xi}_i$ after $t$ time-steps. Additionally, we must marginalize over the unknown time of diagnosis using a time-prior $P(t)$. This finally defines the probability distribution over all states of lymph node involvement used in @eq-bayes-law.
+This evolution implicitly marginalizes over all possible paths to arrive at state $\boldsymbol{\xi}_i$ after $t$ time-steps. Additionally, we must marginalize over the unknown time of diagnosis using a time-prior $P_T(t)$. This finally defines the probability distribution over all states of lymph node involvement used in @eq-bayes-law.
 
 $$
 P \left( \mathbf{X}=\boldsymbol{\xi}_i \mid \boldsymbol{\theta} \right) = \sum_{t=0}^{t_\text{max}} P_T(t) \left( \boldsymbol{\pi} \cdot \mathbf{A}^t \right)_i
 $$ {#eq-marginalized-evolution}
 
 
-where $\boldsymbol{\theta}=\{ b_v, t_{r \rightarrow v} \}$ denotes the set of all model parameters (7 in our case). Fortunately, the exact length and shape of this distribution on its own has little impact as previously shown. We set $t_\text{max}=$ {{< var model.max_t >}} and $P_\text{early}(t)$ to a binomial distribution with parameter {{< var model.first_binom_prob >}}. Further details on the HMM can be found in ...
+where $\boldsymbol{\theta}=\{ b_v, t_{v \rightarrow v+1} \}$ denotes the set of all model parameters (7 in our case). Fortunately, the exact length and shape of this distribution has little impact as previously shown [@ludwig_hidden_2021]. We set $t_\text{max}=$ {{< var model.max_t >}} and $P_\text{early}(t)$ to a binomial distribution with parameter {{< var model.first_binom_prob >}}. Further details on the HMM can be found in @ludwig_hidden_2021.
 
-![On the left: Rough anatomical sketch of the tumor subsites and correspsonding ICD-10 codes that are present in the used data. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graph representation of the lymphatic network considering four LNLs. Blue nodes represent the hidden RVs, while the red one is the tumor. Arcs represent a conditional probability parametrized with the quantity noted next to it](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
+![On the left: Anatomical sketch of the tumor subsites and correspsonding ICD-10 codes considered in this work. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graphical model of the lymphatic network considering four LNLs. Blue nodes represent the hidden states of LNLs $X_v$, while the red one is the tumor. Arcs represent possible routes of metastatic spread, associated with a probability.](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
 
 
 ## Mixture of HMMs {#sec-mixture-of-hmms}
@@ -232,33 +217,36 @@ $$
 P \left( \mathbf{D} \mid \boldsymbol{\theta}, \boldsymbol{\pi}\right) = \prod_s \prod_i \left[ \sum_{m=1}^M \pi_{sm} P_m \left( \mathbf{X}=\boldsymbol{\xi}_i \mid \boldsymbol{\theta}_m \right) \right]^{N_{is}}
 $$ {#eq-mixture-distribution}
 
-We now have two types of parameters, the probabilities of tumor spread for the different models $\boldsymbol{\theta_m}$, and the mixing coefficients $\pi_{sm}$. Assuming a uniform prior in the interval $[0,1]$ for all parameters, the posterior distribution over the parameters $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ is given by the likelihood @eq-mixture-distribution except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the `emcee` Python package [@foreman-mackey_emcee_2013] to sample model parameters from the posterior distribution. However, $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an _expectation-maximization (EM)_ algorithm where we iteratively sample model parameters $\boldsymbol{\theta_m}$ using MCMC and then determine the most likely mixing coefficients.
+We now have two types of parameters, the probabilities of tumor spread for the different models, $\boldsymbol{\theta_m}$, and the mixing coefficients $\pi_{sm}$. Assuming a uniform prior in the interval $[0,1]$ for all parameters, the posterior distribution over the parameters $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ is given by the likelihood in @eq-mixture-distribution except for a normalisation constant. In this work, we use Markov chain Monte Carlo sampling (MCMC) via the `emcee` Python package [@foreman-mackey_emcee_2013] to sample model parameters from the posterior distribution. However, $P \left( \boldsymbol{\theta}, \boldsymbol{\pi} \mid \mathbf{D} \right)$ itself is a multi-model distribution because one can permute the different models. To address this problem, we revert to an _expectation-maximization (EM)_ algorithm where we iterate two steps until convergence of the mixing coefficients. In the E-step, we sample model parameters $\boldsymbol{\theta_m}$ using MCMC for given mixing coefficients $\pi_{sm}$. In the M-step, we maximize the likelihood with respect to the mixing coefficients for given samples of $\boldsymbol{\theta_m}$
 
 
 ## Multi-Centric Data
 
-For the analyses in this work, we used five datasets from four different institutions:
+For the analyses in this work, we used five datasets from four different institutions, resulting in 1242 patients in total.
 
 1. 287 oropharyngeal patients from the University of Zurich in Switzerland
 2. 263 oropharyngeal patients from the Centre Léon Bérard in France
 3. 289 oropharyngeal and oral cavity patients from the Inselspital Bern in Switzerland
 4. 239 oropharyngeal and oral cavity patients from the Centre Léon Bérard in France
-5. 162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain
+5. 162 oropharyngeal patients from the Hospital Vall d'Hebron in Spain (not yet public)
 
-![Prevalence of LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shades of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b"}
+![Prevalence of ipsilateral LNL involvement stratified by subsite. The subsites are sorted in ascending order by their prevalence of involvement in LNL II. Oral cavity subsites are plotted in shades of blue, oropharynx subsites in shades of orange.](../figures/prevalence_by_subsite.svg){#fig-prevalence-by-subsite fig-pos="b"}
 
-The data sets 1-4 are publicly available in the form of CSV tables [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). Data set 5 is not yet public but of similar format. For each patient, the primary tumor subsite is reported (among other patient and tumor characteristics) and each individual LNL is reported as metastatic or healthy, according to the available diagnostic modalities (in part pathology after neck dissection, otherwise clinical involvement).
+The data sets 1-4 are publicly available in the form of CSV tables [@ludwig_detailed_2022;@ludwig_multi-centric_2023] and may be interactively explored in our **Ly**mphatic **Pro**gression e**X**plorer [LyProX](https://lyprox.org). For each patient, the primary tumor subsite is reported (among other patient and tumor characteristics) and each individual LNL is reported as metastatic or healthy, according to the available diagnostic modalities (in part pathology after neck dissection, otherwise clinical involvement).
 
-In @fig-prevalence-by-subsite, we have plotted the prevalence of involvement in the four ipsilateral LNLs I, II, III, and IV stratified by the primary tumor's subsite. We included patients with tumors in the oral cavity, gum (C03), floor of mouth (C04), other/unspecified parts of the mouth (C06), other/unspecified parts of tongue (C02), palate (C05), and tumors in the oropharynx (C10), tonsil (C09), base of tongue (C01), resulting in {{< var num_patients.total >}} patients. The figure illustrates the variations in LNL involvement between subsites within the oral cavity and oropharynx categories.
+In @fig-prevalence-by-subsite, we plot the prevalence of involvement in the four ipsilateral LNLs I, II, III, and IV stratified by the primary tumor's subsite. The figure illustrates the variations in LNL involvement between subsites within the oral cavity and oropharynx categories. The number of patients for each subsite is indicated in @fig-cluster-assignments.
 
 
 # Results {#sec-results}
 
+We demonstrate the methodology for a mixture model with $M=2$ components, considering the ipsilateral involvement of LNLs I, II, III, and IV and the primary tumor subsites shown in @fig-prevalence-by-subsite. In @fig-cluster-assignments we show the resulting mixture coefficients $\pi_{sm}$. The interpretation of this result is as follows: tumors of the base of tongue (C01) are fully described by component A, and tumors of the gum (C03) are fully described by component B. These two subsites are the most distinct regarding the involvement of LNLs I and II, and the result is thus intuitive. Component A may be interpreted as a model for oropharynx-like tumor spread, and component B as a model for oral cavity-like tumor spread. All other subsites are described as mixtures. tumors in the tonsil (C09) have LNL involvement similar to base of tongue tumors and are mostly assigned to component A. Instead, tumors of the palate (C05) are to similar degree assigned to components A and B, which is consistent with the anatomical location and the observation that the LNL involvement is in between oropharynx and oral cavity-type patterns (@fig-prevalence-by-subsite).
+
 ![Assignment of each subsite to each of the two components. The further left a subsite, the more it is assigned to component A, the further right, the more to component B. The size of the marker (area) corresponds to the number of patients in the subsite.](../figures/cluster_assignments.svg){#fig-cluster-assignments}
 
-We demonstrate the methodology for a mixture model with $M=2$ components, considering the ipsilateral involvement of LNLs I, II, III, and IV and the primary tumor subsites shown in @fig-prevalence-by-subsite. In @fig-cluster-assignments we show the resulting mixture coefficients $\pi_{sm}$. The interpretation of this result is as follows: Tumors of the base of tongue (C01) are fully described by component A, and tumors of the gum (C03) are fully described by component B. These two subsites are the most distinct regarding the involvement of LNLs I and II, and the result is thus intuitive. Component A may be interpreted as a model for oropharynx-like tumor spread, and component B as a model for oral cavity-like tumor spread. All other subsites are described as mixtures. Tumors in the tonsil (C09) have LNL involvement similar to base of tongue tumors and are mostly assigned to component A. Instead, tumors of the palate (C05) are to similar degree assigned to components A and B, which is consistent with the anatomical location and the observation that the LNL involvement is in between oropharynx and oral cavity-type patterns.
+The @fig-prevalence-comparison illustrates the model's predictions of the overall prevalence of lymph node involvement in LNLs I, II and III (filled histograms) for selected subsites, obtained by summing the probabilities of states where the respecive level is involved. The mixture model is compared to two independent HMM models trained for oral cavity and oropharynx (by pooling the respective subsites). The mixture model and the independent oropharynx model perform similarly for tonsil tumors (C09), which is the largest patient group, dominating the independent oropharynx model and the component B in the mixture model. However, the mixture model better predicts the higher prevalence in level II for base of tongue and palate tumors. 
 
-![The prevalence of involvement as seen in the data (vertical dashed lines), predicted by an independent model for the oropharyngeal or oral cavity patients (outlined histograms), and predicted by the mixture model (filled histograms). Each row correpsonds to one subsite and each column to the predicted or observed prevalence in one LNL.](../figures/prevalence_comparison.svg){#fig-prevalence-comparison fig-env="figure*"}
+![The prevalence of involvement as seen in the data (vertical dashed lines), predicted by an independent model for the oropharyngeal or oral cavity patients (outlined histograms), and predicted by the mixture model (filled histograms). Each row correpsonds to one subsite and each column to one LNL.](../figures/prevalence_comparison.svg){#fig-prevalence-comparison fig-env="figure*"}
+
 
 # Discussion {#sec-discussion}
 
