@@ -92,8 +92,8 @@ stages:
       size: 997595
     - path: scripts/prevalence_by_subsite.py
       hash: md5
-      md5: 130de8249b34fd7065b6d9999dffa81a
-      size: 2623
+      md5: 1b27b6ac6a904a6dab72e1ffa82444d2
+      size: 2637
     params:
       _variables.yml:
         barplot_kwargs:
@@ -111,8 +111,8 @@ stages:
     outs:
     - path: figures/prevalence_by_subsite.svg
       hash: md5
-      md5: e91997dabc98cb4c3349fa511e42edf4
-      size: 46350
+      md5: 980152f2795f8696679dec1f99b68c85
+      size: 47152
   write_num_patients:
     cmd: "python scripts/write_num_patients.py --input data/enhanced.csv --output
       _variables.yml\n"
@@ -311,13 +311,13 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: 932ad1ffe64b0e5eb23d9bd95c2aaa64
-      size: 17876
+      md5: f33ffd53fbc0597fb613a53f42d8aedc
+      size: 18225
     - path: figures
       hash: md5
-      md5: c71b905534ae8c34fb742f9536ec43a5.dir
-      size: 1355310
-      nfiles: 44
+      md5: fe3e947f526bf637eac3f0875f87e38d.dir
+      size: 1416371
+      nfiles: 45
     - path: models
       hash: md5
       md5: aacfd20d1bf7aaa820b038f6e7aecd04.dir
@@ -325,8 +325,8 @@ stages:
       nfiles: 4
     - path: static
       hash: md5
-      md5: 121ab34f0469b57010712594682141a0.dir
-      size: 252522
+      md5: 3f224fd168d985280d09aa13cb18ab7e.dir
+      size: 251112
       nfiles: 1
     params:
       _variables.yml:
@@ -345,9 +345,9 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: 34536eddcca38f14df1b69513ee19f83.dir
-      size: 898896
-      nfiles: 6
+      md5: bf9aa5110ae1aabc86b1d5a9d85632e9.dir
+      size: 1990832
+      nfiles: 21
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
       models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml
@@ -391,7 +391,7 @@ stages:
     outs:
     - path: figures/mixture_history.svg
       hash: md5
-      md5: f504fa39816dcc7787aec4fb5e9ce0f5
+      md5: b32887c0f20ad962176a09569a34552a
       size: 68772
     - path: models/mixture.hdf5
       hash: md5
@@ -4062,8 +4062,8 @@ stages:
       size: 1454016
     - path: scripts/prevalence_superplot.py
       hash: md5
-      md5: df0eecb682e11733a903a89a13f8839f
-      size: 6640
+      md5: e010338303929ce96f26a102b27c3e73
+      size: 6645
     params:
       _variables.yml:
         icd_code_map:
@@ -4094,5 +4094,5 @@ stages:
     outs:
     - path: figures/prevalence_comparison.svg
       hash: md5
-      md5: ae14b91e51a895410b43c703b5b5a4c8
-      size: 127437
+      md5: 91f6c3c5355159d4910a3c006fa4c47b
+      size: 128273

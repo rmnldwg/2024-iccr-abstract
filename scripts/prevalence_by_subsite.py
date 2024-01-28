@@ -70,7 +70,7 @@ def main():
     )
 
     ax.grid(axis="y")
-    ax.set_xlabel("Lymph node level")
+    ax.set_xlabel("Lymph node level (ipsilateral)")
     ax.set_xticklabels(["I", "II", "III", "IV"], rotation=0)
     ax.set_ylabel("Prevalence [%]")
     ax.legend(fontsize="x-small", labelspacing=0.3)

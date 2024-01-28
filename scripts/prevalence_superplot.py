@@ -195,7 +195,7 @@ def main():
             ax.legend(fontsize="x-small", loc="upper right", labelspacing=0.2)
 
     for ax, lnl in zip(axes[0], args.lnls):
-        ax.set_title(f"LNL {lnl}")
+        ax.set_title(f"ipsi LNL {lnl}")
 
     for ax in axes[-1]:
         ax.set_xlabel("prevalence [%]")
