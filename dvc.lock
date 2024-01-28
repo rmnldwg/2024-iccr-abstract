@@ -311,11 +311,11 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: f33ffd53fbc0597fb613a53f42d8aedc
-      size: 18225
+      md5: e7a6c3975c0e7d4560f830d8793708af
+      size: 18859
     - path: figures
       hash: md5
-      md5: fe3e947f526bf637eac3f0875f87e38d.dir
+      md5: d93daf3000eea2b91d606c4bc6ef7620.dir
       size: 1416371
       nfiles: 45
     - path: models
@@ -345,8 +345,8 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: bf9aa5110ae1aabc86b1d5a9d85632e9.dir
-      size: 1990832
+      md5: cff796a2f0fc42c32c9080cefea3ce2e.dir
+      size: 1990809
       nfiles: 21
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
@@ -2228,7 +2228,7 @@ stages:
       size: 60425400
     - path: scripts/plot_component_assignments.py
       hash: md5
-      md5: 0b96a5e2dd0e26c171f68e0b84e0fd0e
+      md5: 441095ab7c4a9b36294f4ea051c8449f
       size: 3426
     params:
       _variables.yml:
@@ -2245,7 +2245,7 @@ stages:
     outs:
     - path: figures/cluster_assignments.svg
       hash: md5
-      md5: 6ae94f7c9122a9246911b91cf812c631
+      md5: 27500fd779c04e361bd01744418b6bc5
       size: 37958
   plot_predicted_prevalence@I-C01:
     cmd: "python scripts/prevalence_comparison.py --mixture-model models/mixture.hdf5
