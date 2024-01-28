@@ -181,6 +181,7 @@ pyrightconfig.json
 !/content/*.qmd
 !/content/*.tex
 !/content/*.sty
+!/content/manuscript_files
 /_site/
 /site_libs/
 /_site
