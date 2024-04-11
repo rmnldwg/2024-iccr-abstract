@@ -311,8 +311,8 @@ stages:
       nfiles: 9
     - path: content/manuscript.qmd
       hash: md5
-      md5: e7a6c3975c0e7d4560f830d8793708af
-      size: 18859
+      md5: 57d9a7627e5164c560a1813394fcdf71
+      size: 19280
     - path: figures
       hash: md5
       md5: d93daf3000eea2b91d606c4bc6ef7620.dir
@@ -345,9 +345,9 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: cff796a2f0fc42c32c9080cefea3ce2e.dir
-      size: 1990809
-      nfiles: 21
+      md5: f20930413f3d505b56192fb6b75f91be.dir
+      size: 911724
+      nfiles: 6
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model
       models/mixture.hdf5 --figure figures/mixture_history.svg --params _variables.yml

@@ -102,7 +102,7 @@ in head and neck cancer depending on primary tumor location}
 ]{Julian Brönnimann}
 \author[%
 1,2%
-]{Yoel Perez Haas}
+]{Yoel Pérez Haas}
 \author[%
 1,2%
 ]{Esmée Lauren Looman}
@@ -132,7 +132,7 @@ in head and neck cancer depending on primary tumor location}
 ]{Matthias Dettmer}
 \author[%
 2%
-]{Bertrand Poumayou}
+]{Bertrand Pouymayou}
 \author[%
 4,5%
 ]{Roland Giger}
@@ -273,8 +273,8 @@ And, building on this work,
 
 Such a personalized risk prediction may allow clinicians to safely
 reduce the elective clinical target volume (CTV-N) and thus reduce
-side-effects that degrade the patient's quality of life
-\autocite{batth_practical_2014}.
+side-effects that degrade the patient's quality of life without
+compromising treatment efficacy \autocite{batth_practical_2014}.
 
 Here, we extend the previous work by incorporating the primary tumor
 location (specified as ICD-10 code) into the model of lymphatic tumor
@@ -289,7 +289,8 @@ between different subsites within the oropharynx and oral cavity. To
 address this issue, we present an approach using mixtures of HMMs. The
 intuition is that the lymphatic spread of a tumor that lies anatomically
 at the boarder of oropharynx and oral cavity (e.g.~tumors in the palate)
-may be described by a mixture of different models.
+may be described by a mixture of different models. Tumor subsites used
+in this work are sketched in figure~\ref{fig-schematic-and-graph}.
 
 \section{Materials and Methods}\label{sec-materials-and-methods}
 
@@ -378,19 +379,19 @@ the set of all model parameters (7 in our case). Fortunately, the exact
 length and shape of this distribution has little impact as previously
 shown \autocite{ludwig_hidden_2021}. We set \(t_\text{max}=\) 10 and
 \(P_\text{early}(t)\) to a binomial distribution with parameter 0.3.
-Further details on the HMM can be found in
-\textcite{ludwig_hidden_2021}.
+Further details on the HMM can be found in \textcite{ludwig_hidden_2021}
+and \textcite{zora231470}.
 
 \begin{figure}[th]
 
 \centering{
 
-\includegraphics{manuscript_files/static/schematic_and_graph.pdf}
+\includegraphics{manuscript_files/mediabag/../static/schematic_and_graph.pdf}
 
 }
 
 \caption{\label{fig-schematic-and-graph}On the left: Anatomical sketch
-of the tumor subsites and correspsonding ICD-10 codes considered in this
+of the tumor subsites and corresponding ICD-10 codes considered in this
 work. The subsite ``other parts of mouth'' (C06) was not drawn. On the
 right: Parametrized graphical model of the lymphatic network considering
 four LNLs. Blue nodes represent the hidden states of LNLs \(X_v\), while
@@ -472,7 +473,7 @@ institutions, resulting in 1242 patients in total.
 
 \centering{
 
-\includegraphics{manuscript_files/figures/prevalence_by_subsite.pdf}
+\includegraphics{manuscript_files/mediabag/../figures/prevalence_by_subsite.pdf}
 
 }
 
@@ -525,7 +526,7 @@ in between oropharynx and oral cavity-type patterns
 
 \centering{
 
-\includegraphics{manuscript_files/figures/cluster_assignments.pdf}
+\includegraphics{manuscript_files/mediabag/../figures/cluster_assignments.pdf}
 
 }
 
@@ -553,7 +554,7 @@ higher prevalence in level II for base of tongue and palate tumors.
 
 \centering{
 
-\includegraphics{manuscript_files/figures/prevalence_comparison.pdf}
+\includegraphics{manuscript_files/mediabag/../figures/prevalence_comparison.pdf}
 
 }
 
@@ -575,6 +576,14 @@ model, which allows us to account for differences in lymph node
 involvement for different subsites. Future work will extend the work to
 tumors in the hypopharynx and larynx and optimize the number of model
 components.
+
+\section*{Acknowledgements}\label{acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements}
+
+This work was supported by the clinical research priority program (CRPP)
+``Artificial intelligence in oncological imaging'' of the University of
+Zurich and by the Swiss cancer research foundation under grant KFS
+5645--08--2022.
 
 \printbibliography
 

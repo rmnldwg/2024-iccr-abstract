@@ -11,7 +11,7 @@ author:
     affiliations:
       - ref: 1
       - ref: 2
-  - name: Yoel Perez Haas
+  - name: Yoel Pérez Haas
     affiliations:
       - ref: 1
       - ref: 2
@@ -51,7 +51,7 @@ author:
     affiliations:
       - ref: 6
       - ref: 10
-  - name: Bertrand Poumayou
+  - name: Bertrand Pouymayou
     orcid: 0000-0002-8060-7827
     affiliations:
       - ref: 2
@@ -132,6 +132,7 @@ format:
     keep-tex: true
     include-in-header:
       - text: "\\usepackage{newtxtext,newtxmath}"
+    link-citations: true
   html:
     code-line-numbers: true
     code-tools: true
@@ -154,9 +155,9 @@ And, building on this work,
 
 2. an interpretable hidden Markov model (HMM), trained with this data, to predict the risk for occult nodal disease, given an individual patient's diagnosis [@ludwig_hidden_2021].
 
-Such a personalized risk prediction may allow clinicians to safely reduce the elective clinical target volume (CTV-N) and thus reduce side-effects that degrade the patient's quality of life [@batth_practical_2014].
+Such a personalized risk prediction may allow clinicians to safely reduce the elective clinical target volume (CTV-N) and thus reduce side-effects that degrade the patient's quality of life without compromising treatment efficacy [@batth_practical_2014].
 
-Here, we extend the previous work by incorporating the primary tumor location (specified as ICD-10 code) into the model of lymphatic tumor progression, focusing on tumors in the oropharynx and the oral cavity. HNSCC patients with primary tumors at different subsites show different patterns of lymphatic spread [@lindberg_distribution_1972;@woolgar_histological_1999]. So far, this could be handled by training different models for broader categories of tumor locations, e.g. oropharynx and oral cavity tumors. However, this approach does not describe differences in lymphatic spread between different subsites within the oropharynx and oral cavity. To address this issue, we present an approach using mixtures of HMMs. The intuition is that the lymphatic spread of a tumor that lies anatomically at the boarder of oropharynx and oral cavity (e.g. tumors in the palate) may be described by a mixture of different models.
+Here, we extend the previous work by incorporating the primary tumor location (specified as ICD-10 code) into the model of lymphatic tumor progression, focusing on tumors in the oropharynx and the oral cavity. HNSCC patients with primary tumors at different subsites show different patterns of lymphatic spread [@lindberg_distribution_1972;@woolgar_histological_1999]. So far, this could be handled by training different models for broader categories of tumor locations, e.g. oropharynx and oral cavity tumors. However, this approach does not describe differences in lymphatic spread between different subsites within the oropharynx and oral cavity. To address this issue, we present an approach using mixtures of HMMs. The intuition is that the lymphatic spread of a tumor that lies anatomically at the boarder of oropharynx and oral cavity (e.g. tumors in the palate) may be described by a mixture of different models. Tumor subsites used in this work are sketched in @fig-schematic-and-graph.
 
 
 # Materials and Methods {#sec-materials-and-methods}
@@ -202,9 +203,9 @@ P \left( \mathbf{X}=\boldsymbol{\xi}_i \mid \boldsymbol{\theta} \right) = \sum_{
 $$ {#eq-marginalized-evolution}
 
 
-where $\boldsymbol{\theta}=\{ b_v, t_{v \rightarrow v+1} \}$ denotes the set of all model parameters (7 in our case). Fortunately, the exact length and shape of this distribution has little impact as previously shown [@ludwig_hidden_2021]. We set $t_\text{max}=$ {{< var model.max_t >}} and $P_\text{early}(t)$ to a binomial distribution with parameter {{< var model.first_binom_prob >}}. Further details on the HMM can be found in @ludwig_hidden_2021.
+where $\boldsymbol{\theta}=\{ b_v, t_{v \rightarrow v+1} \}$ denotes the set of all model parameters (7 in our case). Fortunately, the exact length and shape of this distribution has little impact as previously shown [@ludwig_hidden_2021]. We set $t_\text{max}=$ {{< var model.max_t >}} and $P_\text{early}(t)$ to a binomial distribution with parameter {{< var model.first_binom_prob >}}. Further details on the HMM can be found in @ludwig_hidden_2021 and @zora231470.
 
-![On the left: Anatomical sketch of the tumor subsites and correspsonding ICD-10 codes considered in this work. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graphical model of the lymphatic network considering four LNLs. Blue nodes represent the hidden states of LNLs $X_v$, while the red one is the tumor. Arcs represent possible routes of metastatic spread, associated with a probability.](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
+![On the left: Anatomical sketch of the tumor subsites and corresponding ICD-10 codes considered in this work. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graphical model of the lymphatic network considering four LNLs. Blue nodes represent the hidden states of LNLs $X_v$, while the red one is the tumor. Arcs represent possible routes of metastatic spread, associated with a probability.](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
 
 
 ## Mixture of HMMs {#sec-mixture-of-hmms}
@@ -251,3 +252,8 @@ The @fig-prevalence-comparison illustrates the model's predictions of the overal
 # Discussion {#sec-discussion}
 
 We have previously developed a model of lymphatic progression of HNSCC using HMM, which allows us to estimate the probability of occult lymph node metastases in clinically negative LNLs. Mixture models are a suitable method to incorporate the primary tumor location into the model, which allows us to account for differences in lymph node involvement for different subsites. Future work will extend the work to tumors in the hypopharynx and larynx and optimize the number of model components.
+
+# Acknowledgements {.unnumbered}
+
+This work was supported by the clinical research priority program (CRPP) "Artificial intelligence in oncological imaging" of the University of Zurich and by the Swiss cancer research foundation under 
+grant KFS 5645–08–2022.
