@@ -315,9 +315,9 @@ stages:
       size: 19280
     - path: figures
       hash: md5
-      md5: d93daf3000eea2b91d606c4bc6ef7620.dir
-      size: 1416371
-      nfiles: 45
+      md5: 3aa77038adaa395a98df3844a75155e6.dir
+      size: 1356948
+      nfiles: 44
     - path: models
       hash: md5
       md5: aacfd20d1bf7aaa820b038f6e7aecd04.dir
@@ -345,8 +345,8 @@ stages:
     outs:
     - path: _site/
       hash: md5
-      md5: f20930413f3d505b56192fb6b75f91be.dir
-      size: 911724
+      md5: 8565617eafae8db6008cc06fad40acbf.dir
+      size: 905665
       nfiles: 6
   mixture_model_em_sampling:
     cmd: "python scripts/mixture_model_sampling.py --input data/enhanced.csv --model

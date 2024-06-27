@@ -205,7 +205,7 @@ $$ {#eq-marginalized-evolution}
 
 where $\boldsymbol{\theta}=\{ b_v, t_{v \rightarrow v+1} \}$ denotes the set of all model parameters (7 in our case). Fortunately, the exact length and shape of this distribution has little impact as previously shown [@ludwig_hidden_2021]. We set $t_\text{max}=$ {{< var model.max_t >}} and $P_\text{early}(t)$ to a binomial distribution with parameter {{< var model.first_binom_prob >}}. Further details on the HMM can be found in @ludwig_hidden_2021 and @zora231470.
 
-![On the left: Anatomical sketch of the tumor subsites and corresponding ICD-10 codes considered in this work. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graphical model of the lymphatic network considering four LNLs. Blue nodes represent the hidden states of LNLs $X_v$, while the red one is the tumor. Arcs represent possible routes of metastatic spread, associated with a probability.](../static/schematic_and_graph.svg){#fig-schematic-and-graph fig-pos="th"}
+![On the left: Anatomical sketch of the tumor subsites and corresponding ICD-10 codes considered in this work. The subsite "other parts of mouth" (C06) was not drawn. On the right: Parametrized graphical model of the lymphatic network considering four LNLs. Blue nodes represent the hidden states of LNLs $X_v$, while the red one is the tumor. Arcs represent possible routes of metastatic spread, associated with a probability.](../static/schematic_and_graph.png){#fig-schematic-and-graph fig-pos="th"}
 
 
 ## Mixture of HMMs {#sec-mixture-of-hmms}
